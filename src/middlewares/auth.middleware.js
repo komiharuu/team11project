@@ -1,4 +1,5 @@
 // src/middlewares/auth.middleware.js
+// 사용자인증 미들웨어
 
 import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma.util.js';

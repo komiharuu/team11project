@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write *.js **/*.js"
+   
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
