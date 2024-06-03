@@ -53,7 +53,8 @@ model RefreshToken {
 
   user User @relation(fields: [userId], references: [userId])
 
-  @@map("refresh_token")
+
+  @@map("refreshtoken")
 }
 
 model Post {

@@ -3,7 +3,7 @@ import { prisma } from "../utils/prisma.util.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import accessMiddleware from "../middlewares/access-token.middleware.js";
+import accessToken from "../middlewares/access-token.middleware.js";
 
 const router = Router();
 
@@ -77,7 +77,7 @@ router.post("/sign-up", async (req, res, next) => {
       status: 201,
       message: "회원가입에 성공했습니다.",
       data: {
-        userId: user.id,
+        userId: user.userId,
         email: user.email,
         name: user.userInfo.name,
         introduce: user.userInfo.introduce,
@@ -93,7 +93,7 @@ router.post("/sign-up", async (req, res, next) => {
 });
 
 /** 프로필 수정 API 구현 **/
-router.patch("/user/:userid", accessMiddleware, async (req, res, next) => {
+router.patch("/user/:userid", accessToken, async (req, res, next) => {
   try {
     const userId = req.params.userid;
     const { name, introduce, password, passwordConfirm } = req.body;
@@ -135,8 +135,8 @@ router.patch("/user/:userid", accessMiddleware, async (req, res, next) => {
         ...userDataUpdate,
         userInfo: {
           update: {
-            name: name || userInfo.name,
-            introduce: introduce || userInfo.introduce,
+            name: name || (user.userInfo && user.userInfo.name),
+            introduce: introduce || (user.userInfo && user.userInfo.introduce),
           },
         },
       },
