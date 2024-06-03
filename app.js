@@ -17,7 +17,8 @@ const PORT = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 app.use('/auth', AuthRouter )
-app.use('/api', [PostRouter, CommentRouter, UserRouter]);
+app.use('/post', PostRouter )
+app.use('/api', [CommentRouter, UserRouter]);
 app.use(ErrorHandlingMiddleware);
 app.listen(PORT, () => {
   console.log(PORT, '포트로 서버가 열렸어요!');
