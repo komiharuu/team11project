@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -21,12 +22,17 @@ model User {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   userInfo      UserInfo?
-  refreshToken  RefreshToken?
+
+
+  RefreshToken  RefreshToken?
+
+
   posts         Post[]
   comments      Comment[]
 
 
   @@map("User")
+
 }
 
 model UserInfo {
@@ -43,14 +49,18 @@ model UserInfo {
 }
 
 model RefreshToken {
-  userId       Int          @unique
-  token        String       @unique
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  user         User         @relation(fields: [userId], references: [userId])
 
-  @@map("refreshToken")
-}
+  Id       Int     @id @default(autoincrement()) @map("Id")
+ UserId    Int   @unique    @map("UserId")
+ refresh_token    String?  @map("refresh_token")
+createdAt DateTime @default(now()) @map("createdAt")
+updatedAt DateTime @updatedAt  @map("updatedAt")
+  
+
+  User User  @relation(fields:[UserId], references: [userId], onDelete:Cascade)
+  @@map("RefreshToken")
+  }
+
 
 model Post {
   postId             Int          @id @default(autoincrement())
@@ -78,4 +88,5 @@ model Comment {
   user         User         @relation(fields: [userId], references: [userId])
   
   @@map("comment")
+
 }
