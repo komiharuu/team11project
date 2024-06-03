@@ -14,6 +14,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
+
+//loginhtml과 authrouter 연결
+app.set("views","./homepage"); //hompage폴더 안에 있는.
+app.set("view engine", "ejs");
+//무언가하는중
+// app.get('/auth/sign-in',(req,res) =>{
+  // res.render("login");
+// })
+
 app.use(express.json());
 app.use(cookieParser());
 app.use('/auth', AuthRouter )

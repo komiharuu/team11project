@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login페이지</title>
+  
+</head>
+<body>
+  <div class="container">
+      <h2>Login페이지</h2>
+      <input id="id" type="text" placeholder="이메일"><br>
+      <input id="psword" type="text" placeholder="비밀번호"><br>
+      <button>로그인</button>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+ const id =document.querySelector("#id")
+ const psword =document.querySelector("#psword")
+ const loginBtn =document.querySelector("button")
+  
+ loginBtn.addEventListener("click", login);
+
+ function login(){
+
+ const req = {
+   id:id.value,
+   psword:psword.value,
+ };
+//서버로 전달하기 위해 fetch를 이용한다.
+//  fetch();
+console.log(req)
+}
+
+  </script>
+</body>
+</html>
