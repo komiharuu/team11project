@@ -1,6 +1,5 @@
-
-import jwt from 'jsonwebtoken';
-import { prisma } from '../utils/prisma.util.js';
+import jwt from "jsonwebtoken";
+import { prisma } from "../utils/prisma.util.js";
 const ACCESS_TOKEN_SECRET_KEY = process.env.ACCESS_TOKEN_SECRET_KEY;
 
 export default async function (req, res, next) {
@@ -8,7 +7,7 @@ export default async function (req, res, next) {
     const { authorization } = req.headers;
     if (!authorization) throw new Error("토큰이 존재하지 않습니다.");
 
-    const [tokenType, accessToken] = authorization.split(' ');
+    const [tokenType, accessToken] = authorization.split(" ");
 
     if (tokenType !== "Bearer")
       throw new Error("토큰 타입이 일치하지 않습니다.");
@@ -28,7 +27,6 @@ export default async function (req, res, next) {
 
     next();
   } catch (error) {
-
     // 토큰이 만료되었거나, 조작되었을 때, 에러 메시지를 다르게 출력합니다.
     switch (error.name) {
       case "TokenExpiredError":
@@ -38,7 +36,7 @@ export default async function (req, res, next) {
       default:
         return res
           .status(401)
-          .json({ message: error.message ?? '비정상적인 요청입니다.' });
+          .json({ message: error.message ?? "비정상적인 요청입니다." });
     }
   }
 }
