@@ -60,7 +60,7 @@ export const requireRefreshToken = async(req, res, next)=>{
    //DB에서 RefreshToken을 조회
    const existedRefreshToken = await prisma.refreshToken.findUnique({
     where:{
-        UserId: userId,
+        userId: userId,
     }
    })
    //넘겨 받은 RefreshToken과 비교
