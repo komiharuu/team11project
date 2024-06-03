@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -22,8 +23,9 @@ model User {
 
   userInfo     UserInfo?
   refreshToken RefreshToken?
-  posts        Post[]
-  comments     Comment[]
+
+  posts    Post[]
+  comments Comment[]
 
   @@map("user")
 }
@@ -45,7 +47,7 @@ model UserInfo {
 model RefreshToken {
   refreshTokenId Int      @id @default(autoincrement())
   userId         Int      @unique
-  token          String   @unique
+  refresh_token  String?  @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
