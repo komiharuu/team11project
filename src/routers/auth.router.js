@@ -295,6 +295,8 @@ router.get('/verify-email/:email', async (req, res) => {
       res.status(400).json({ message: '인증번호를 다시 확인해주세요.' });
       return;
     }
+
+    
 // 메일 주체가 다르다?
     if (record.verificationCode === parseInt(verificationCode, 10)) {
       res.status(200).json({ message: '이메일이 성공적으로 인증되었습니다.' });
