@@ -26,6 +26,12 @@
 - 서버 실행(개발용)
   `yarn dev`
 
+## 사용 기술
+  <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white">
+  <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
+  <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> 
+
+
 ## 프로젝트 부가 내용
 
 [팀 노션](https://teamsparta.notion.site/zanmang-roopy-09cfc1b37dda4094bde8933def7a89a9)
