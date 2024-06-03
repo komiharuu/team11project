@@ -4,12 +4,14 @@ import { prisma } from '../utils/prisma.util.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
+
 const router = express.Router();
 
 //하는중
 router.get('/sign-in',(req,res) =>{
   res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
 })
+
 
 
   //로그인 API

@@ -26,9 +26,11 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use('/auth', AuthRouter )
 app.use('/post', PostRouter )
 app.use('/api', [CommentRouter, UserRouter]);
+
 app.use(ErrorHandlingMiddleware);
 app.listen(PORT, () => {
   console.log(PORT, "포트로 서버가 열렸어요!");
