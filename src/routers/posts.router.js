@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
-import accessMiddleware from '../middlewares/auth.middleware.js';
+
+import accessMiddleware from '../middlewares/access-token.middleware.js';
+
 // // 3번째 줄 이거 사용자 인증기능할때 쓰세요
 
 const router = Router();
@@ -33,7 +35,6 @@ router.post('/', accessMiddleware, async (req, res, next) => {
         imageurl: imageurl,
       },
     });
-
 
 
     // 클라이언트에 생성된 데이터를 반환합니다.
@@ -70,7 +71,6 @@ router.get('/',  async (req, res, next) => {
       }
     });
 
-   
 
     res.status(200).json({ data: posts });
   } catch (err) {
@@ -206,4 +206,6 @@ router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
   }
 });
 
+
 export default router;
+

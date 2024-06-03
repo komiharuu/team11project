@@ -5,11 +5,18 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
 
-
 const router = express.Router();
+
+//하는중
+router.get('/sign-in',(req,res) =>{
+  res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
+})
+
+
 
   //로그인 API
   router.post('/sign-in', async (req, res, next) => {
+   
     const { email, password } = req.body;
     // - **로그인 정보 중 하나라도 빠진 경우** - “OOO을 입력해 주세요.”
     if (!email || !password) {
@@ -69,13 +76,13 @@ const router = express.Router();
    const hashedRefreshToken = bcrypt.hashSync(refreshToken,10);
    await prisma.refreshToken.upsert({
     where:{
-      UserId : user.userId
+      userId : user.userId
     },
     update:{
       refresh_token:hashedRefreshToken,
     },
     create:{
-      UserId : user.userId,
+      userId : user.userId,
       refresh_token:hashedRefreshToken,
     }
   })
@@ -111,12 +118,12 @@ router.post('/token', requireRefreshToken, async(req, res, next)=>{
    const hashedRefreshToken = bcrypt.hashSync(refreshToken,10);
 
    await prisma.refreshToken.upsert({
-    where: {UserId : user.userId},
+    where: {userId : user.userId},
     update:{
       refresh_token:hashedRefreshToken,
     },
     create:{
-      UserId : user.userId,
+      userId : user.userId,
       refresh_token:hashedRefreshToken,
     }
   })
@@ -141,7 +148,7 @@ router.post('/sign-out', requireRefreshToken, async(req, res, next)=>{
     const user = req.user;
     //refreshToken 로그아웃시 Null 값
     await prisma.refreshToken.update({
-      where:{UserId:user.userId},
+      where:{userId:user.userId},
       data:{
         refresh_token:null,
       }
