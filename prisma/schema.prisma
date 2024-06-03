@@ -85,3 +85,11 @@ model Comment {
 
   @@map("comment")
 }
+
+model Email {
+  verificationCode Int @unique
+  email            String
+  createdAt DateTime @default(now())
+
+  @@map("email")
+}
