@@ -7,7 +7,7 @@ import accessMiddleware from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-/** 사용자 회원가입 API **/
+/** 회원가입 API 구현**/
 router.post("/sign-up", async (req, res, next) => {
   try {
     const { email, password, passwordConfirm, name, introduce, profileImgurl } =
