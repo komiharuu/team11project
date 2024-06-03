@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
 const router = express.Router();
 
-//하는중
+//주소 치면 login.ejs설정화면이동!
 router.get('/sign-in',(req,res) =>{
   res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
 })
