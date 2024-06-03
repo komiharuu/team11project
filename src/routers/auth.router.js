@@ -3,6 +3,7 @@ import express from 'express';
 import { prisma } from '../utils/prisma.util.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import validator from "validator";
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
 
 const router = express.Router();
