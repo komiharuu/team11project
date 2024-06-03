@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/auth', AuthRouter )
-app.use('/post', PostRouter )
+app.use('/posts', PostRouter )
 app.use('/api', [CommentRouter, UserRouter]);
 
 app.use(ErrorHandlingMiddleware);
