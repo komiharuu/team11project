@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import validator from "validator";
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
-
+import sendEmail from '../constants/transport.constant.js';
 const router = express.Router();
 
 // 회원가입
@@ -240,5 +240,26 @@ router.post('/sign-out', requireRefreshToken, async(req, res, next)=>{
     next(err);
   }
 })
+
+
+// 이메일 인증 api
+
+router.post('/send-email', async (req, res) => {
+  try {
+  
+    const { email } = req.body;
+
+    // 이메일을 보내는 함수를 호출하여 인증 메일을 사용자 이메일 주소로 전송합니다.
+    await sendEmail(email);
+
+    // 성공적으로 이메일을 보낸 후 클라이언트에게 응답합니다.
+    res.status(200).json({ message: '인증번호가 성공적으로 전송되었습니다' });
+  } catch (error) {
+    // 이메일 전송 중 오류가 발생한 경우 오류를 클라이언트에게 전달합니다.
+    res.status(500).json({ message: '이메일 전송 중 오류가 발생했습니다.' });
+  }
+});
+
+
 
 export default router;

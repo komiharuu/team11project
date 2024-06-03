@@ -7,7 +7,7 @@ import PostRouter from "./src/routers/posts.router.js";
 import AuthRouter from "./src/routers/auth.router.js";
 import CommentRouter from "./src/routers/comment.router.js";
 import UserRouter from "./src/routers/user.router.js";
-
+import cors from "cors";
 import ErrorHandlingMiddleware from "./src/middlewares/error-handler.middleware.js";
 dotenv.config();
 
@@ -26,7 +26,7 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.use(cors());
 app.use('/auth', AuthRouter )
 app.use('/posts', PostRouter )
 app.use('/api', [CommentRouter, UserRouter]);
