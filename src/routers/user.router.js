@@ -63,7 +63,7 @@ router.post("/sign-up", async (req, res, next) => {
     });
 
     // AccessToken 생성
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
         userId: user.id,
       },
@@ -71,7 +71,7 @@ router.post("/sign-up", async (req, res, next) => {
       { expiresIn: "12h" },
     );
 
-    res.cookie("authorization", `Bearer ${token}`);
+    res.cookie("authorization", accessToken );
 
     return res.status(201).json({
       status: 201,
@@ -84,7 +84,6 @@ router.post("/sign-up", async (req, res, next) => {
         profileImgurl: user.userInfo.profileImgurl,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        accessToken: token,
       },
     });
   } catch (err) {
@@ -93,10 +92,10 @@ router.post("/sign-up", async (req, res, next) => {
 });
 
 /** 프로필 수정 API 구현 **/
-router.patch("/user/:userid", accessToken, async (req, res, next) => {
+router.patch("/:userid", accessToken, async (req, res, next) => {
   try {
     const userId = req.params.userid;
-    const { name, introduce, password, passwordConfirm } = req.body;
+    const { name, introduce, password, passwordConfirm, profileImgurl } = req.body;
 
     // 유효성 검사
     if ((!name && !introduce && !password) || (password && !passwordConfirm)) {
@@ -137,6 +136,7 @@ router.patch("/user/:userid", accessToken, async (req, res, next) => {
           update: {
             name: name || (user.userInfo && user.userInfo.name),
             introduce: introduce || (user.userInfo && user.userInfo.introduce),
+            profileImgurl: profileImgurl || (user.userInfo && user.userInfo.profileImgurl),
           },
         },
       },
@@ -150,6 +150,7 @@ router.patch("/user/:userid", accessToken, async (req, res, next) => {
         email: updateUser.email,
         name: updateUser.userInfo.name,
         introduce: updateUser.userInfo.introduce,
+        profileImgurl : updateUser.userInfo.profileImgurl ,
       },
     });
   } catch (err) {

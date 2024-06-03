@@ -29,7 +29,8 @@ app.use(cookieParser());
 app.use(cors());
 app.use('/auth', AuthRouter )
 app.use('/posts', PostRouter )
-app.use('/api', [CommentRouter, UserRouter]);
+app.use('/users', UserRouter)
+app.use('/comments', CommentRouter);
 
 app.use(ErrorHandlingMiddleware);
 app.listen(PORT, () => {

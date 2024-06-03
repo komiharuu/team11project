@@ -142,13 +142,13 @@ router.get('/sign-in',(req,res) =>{
         userId: user.userId,
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
-      { expiresIn: '12h' },
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES },
     );
     //refresh토큰  발급
   const refreshToken = jwt.sign(
     {
       userId : user.userId,
-    },process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn: '7d'});
+    },process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn: process.env.REFRESH_TOKEN_EXPIRES});
 
    const hashedRefreshToken = bcrypt.hashSync(refreshToken,10);
    await prisma.refreshToken.upsert({
@@ -242,7 +242,7 @@ router.post('/sign-out', requireRefreshToken, async(req, res, next)=>{
 
 // 이메일 인증 api
 
-router.post('/send-email', async (req, res) => {
+router.post('/verify-email', async (req, res) => {
   try {
   
     const { email } = req.body;
@@ -263,7 +263,7 @@ router.post('/send-email', async (req, res) => {
     res.status(200).json({ message: '인증번호가 성공적으로 전송되었습니다' });
   } catch (error) {
     // 이메일 전송 중 오류가 발생한 경우 오류를 클라이언트에게 전달합니다.
-    res.status(500).json({ message: '이메일 전송 중 오류가 발생했습니다.' });
+    res.status(400).json({ message: '이메일 전송에 실패했습니다.' });
   }
 });
 
@@ -275,7 +275,6 @@ router.post('/send-email', async (req, res) => {
 
 
 //이메일 인증번호 확인 api 
-//어떻게 꺼내오느냐가 문제. 미들웨어 따로 구현해야되나?
 
 router.get('/verify-email/:email', async (req, res) => {
   try {
@@ -292,7 +291,7 @@ router.get('/verify-email/:email', async (req, res) => {
     // 최신의 인증번호로 유효하게 합니다.
     
     if (!record) {
-      res.status(400).json({ message: '인증번호를 다시 확인해주세요.' });
+      res.status(400).json({ message: '인증번호를 다시 확인해주세요' });
       return;
     }
 
@@ -301,7 +300,7 @@ router.get('/verify-email/:email', async (req, res) => {
     if (record.verificationCode === parseInt(verificationCode, 10)) {
       res.status(200).json({ message: '이메일이 성공적으로 인증되었습니다.' });
     } else {
-      res.status(400).json({ message: '인증번호를 다시 확인해주세요.' });
+      res.status(400).json({ message: '인증번호가 일치하지 않습니다.' });
     }
   } catch (error) {
     console.error("Error:", error);
