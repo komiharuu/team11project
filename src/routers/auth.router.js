@@ -4,15 +4,10 @@ import { prisma } from '../utils/prisma.util.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
-import accessMiddleware from '../middlewares/auth.middleware.js';
+
 
 const router = express.Router();
 
-
-
-
-  
-  
   //로그인 API
   router.post('/sign-in', async (req, res, next) => {
     const { email, password } = req.body;
@@ -95,7 +90,7 @@ const router = express.Router();
   
 
 //refresh토큰 재발급
-router.post('/token',requireRefreshToken, async(req, res, next)=>{
+router.post('/token', requireRefreshToken, async(req, res, next)=>{
  try{
     const user = req.user; //미들웨어인증받은 user
     const payload = { userId: user.userId };
