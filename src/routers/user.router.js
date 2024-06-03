@@ -62,16 +62,16 @@ router.post("/sign-up", async (req, res, next) => {
       include: { userInfo: true },
     });
 
-    // AccessToken 생성
-    const accessToken = jwt.sign(
-      {
-        userId: user.id,
-      },
-      process.env.ACCESS_TOKEN_SECRET_KEY,
-      { expiresIn: "12h" },
-    );
+    // // AccessToken 생성- 이부분은 로그인에서 처리하므로 생략해도 될 것 같습니다
+    // const accessToken = jwt.sign(
+    //   {
+    //     userId: user.id,
+    //   },
+    //   process.env.ACCESS_TOKEN_SECRET_KEY,
+    //   { expiresIn: "12h" },
+    // );
 
-    res.cookie("authorization", accessToken );
+    // req.header("authorization", accessToken );
 
     return res.status(201).json({
       status: 201,
