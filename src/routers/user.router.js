@@ -3,7 +3,7 @@ import { prisma } from "../utils/prisma.util.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
 
-import accessMiddleware from "../middlewares/access-token.middleware.js";
+import  accessToken  from '../middlewares/access-token.middleware.js';
 
 
 const router = Router();
