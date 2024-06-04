@@ -26,6 +26,7 @@ model User {
 
   posts    Post[]
   comments Comment[]
+  like Like[]
 
   @@map("user")
 }
@@ -68,6 +69,7 @@ model Post {
 
   user     User      @relation(fields: [userId], references: [userId])
   comments Comment[]
+  like Like[]
 
   @@map("post")
 }
@@ -92,4 +94,18 @@ model Email {
   createdAt DateTime @default(now())
 
   @@map("email")
+}
+
+model Like {
+  likeId    Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [userId])
+  post Post @relation(fields: [postId], references: [postId])
+
+  @@unique([userId, postId])
+
+   @@map("like")
 }

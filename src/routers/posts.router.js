@@ -6,6 +6,8 @@ import {PostValidator } from "../validatiors/update-post-status.js"
 
 const router = Router();
 
+
+
 // 게시글 등록 api
 router.post('/', accessToken, PostValidator, async (req, res, next) => {
     
@@ -184,6 +186,83 @@ router.delete("/:postId", accessToken, async (req, res, next) => {
       .json({ message: "게시글이 삭제되었습니다.", data: postId });
   } catch (error) {
     next(error);
+  }
+});
+
+
+//좋아요 생성, 삭제 기능 구현중
+//게시물 좋아요 추가
+router.post('/likes/:postId', accessToken, async (req, res, next) => {
+  const { postId } = req.params;
+  const userId = req.user.userId;
+  try {
+  const existingLike = await prisma.like.findFirst({
+    where: {
+      userId,
+      postId:+postId
+    }
+  });
+  
+  if (existingLike) {
+    return res.status(400).json({
+      status: 400,
+      message: '이미 이 게시물에 좋아요를 눌렀습니다.'
+    });
+  }
+
+  
+    // 게시물 좋아요 추가
+    const like = await prisma.like.create({
+      data: {
+        userId,
+        postId:+postId
+      }
+    });
+
+    return res.status(201).json({
+      status: 201,
+      message: '게시물 좋아요가 추가되었습니다.',
+      data: like
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 게시물 좋아요 제거
+router.delete('/likes/:postId', accessToken, async (req, res, next) => {
+  const { postId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+   //게시물 존재 유무
+   const existingPost = await prisma.post.findUnique({
+    where: {
+      postId: +postId
+    }
+  });
+  if (!existingPost) {
+    return res.status(404).json({
+      status: 404,
+      message: '해당 게시물이 존재하지 않습니다.'
+    });
+  }
+
+
+    // 게시물 좋아요 제거
+    await prisma.like.deleteMany({
+      where: {
+        postId :+postId,
+        userId
+      }
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: '게시물 좋아요가 제거되었습니다.'
+    });
+  } catch (err) {
+    next(err);
   }
 });
 
