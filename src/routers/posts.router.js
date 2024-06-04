@@ -1,30 +1,19 @@
 import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
 import  accessToken  from '../middlewares/access-token.middleware.js';
-
+import {PostValidator } from "../validatiors/update-post-status.js"
 
 
 const router = Router();
 
 // 게시글 등록 api
-router.post('/', accessToken, async (req, res, next) => {
+router.post('/', accessToken, PostValidator, async (req, res, next) => {
     
   const { recommendedArea, recommendationReason, imageurl } = req.body;
   const user = req.user;
   try {
     // 필수 필드가 모두 제공되었는지 확인합니다.
-    if (!recommendedArea) {
-      return res.status(400).json({ message: '추천 지역을 입력해 주세요.' });
-    }
-    if (!recommendationReason) {
-      return res.status(400).json({ message: '추천 이유를 입력해 주세요.' });
-    }
-    if (!imageurl) {
-      return res.status(400).json({ message: '여행지 사진을 등록해 주세요.' });
-    }
-
-
-
+ 
     // // Post 데이터를 데이터베이스에 삽입합니다.
     const posts = await prisma.post.create({
       data: {

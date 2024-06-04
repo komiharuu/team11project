@@ -8,7 +8,8 @@ import { requireRefreshToken } from '../middlewares/require-refresh-token.middle
 import sendEmail from '../constants/transport.constant.js';
 const router = express.Router();
 
-// 회원가입
+
+// 회원가입 api
 router.post("/sign-up", async (req, res, next) => {
   try {
     const { email, password, passwordConfirm, name, introduce, profileImgurl } =
@@ -63,11 +64,24 @@ router.post("/sign-up", async (req, res, next) => {
       include: { userInfo: true },
     });
 
+
+    // // AccessToken 생성- 이부분은 로그인에서 처리하므로 생략해도 될 것 같습니다
+    // const accessToken = jwt.sign(
+    //   {
+    //     userId: user.id,
+    //   },
+    //   process.env.ACCESS_TOKEN_SECRET_KEY,
+    //   { expiresIn: "12h" },
+    // );
+
+    // req.header("authorization", accessToken );
+
+
     return res.status(201).json({
       status: 201,
       message: "회원가입에 성공했습니다.",
       data: {
-        userId: user.id,
+        userId: user.userId,
         email: user.email,
         name: user.userInfo.name,
         introduce: user.userInfo.introduce,
@@ -267,10 +281,6 @@ router.post('/verify-email', async (req, res) => {
   }
 });
 
-// 서버에서 인증번호를 알고있어야한다. 그래서 스키마를 추가했습니다.
-// 서버가 열렸을때 메모리 임시저장
-// 데이터베이스 따로 생성 email과 인증코드
-// 인증번호 발급. 그때부터 알아야 한다. 개발 처음부터 스키마 짜는 것이 좋다.
 
 
 
@@ -281,7 +291,7 @@ router.get('/verify-email/:email', async (req, res) => {
     const { verificationCode} = req.body;
     const email = req.params.email; 
   
-    // Check if the provided verification code and email exist in the database
+    // 데이터베이스에 이메일이 저장되어있는지 확인합니다.
     const record = await prisma.email.findFirst({
       where: {email },
       orderBy: { createdAt: 'desc' }
@@ -296,7 +306,8 @@ router.get('/verify-email/:email', async (req, res) => {
     }
 
     
-// 메일 주체가 다르다?
+// 인증 번호가 같으면 인증에 성공하고, 다르면 실패하는 과정입니다.
+
     if (record.verificationCode === parseInt(verificationCode, 10)) {
       res.status(200).json({ message: '이메일이 성공적으로 인증되었습니다.' });
     } else {
