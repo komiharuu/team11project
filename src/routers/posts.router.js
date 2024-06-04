@@ -7,7 +7,6 @@ import {PostValidator } from "../validatiors/update-post-status.js"
 const router = Router();
 
 
-
 // 게시글 등록 api
 router.post('/', accessToken, PostValidator, async (req, res, next) => {
     
