@@ -2,26 +2,16 @@ import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
 import bcrypt from "bcrypt";
 import accessToken from "../middlewares/access-token.middleware.js";
-import profileUpdatedSchema from "../validatiors/update-post-status.js";
+import {ProfileValidator} from "../validatiors/profileUpdatedSchema.js";
 
 const router = Router();
 
 /** 프로필 수정 API 구현 **/
-router.patch("/:userid", accessToken, async (req, res, next) => {
+router.patch("/:userid", accessToken, ProfileValidator, async (req, res, next) => {
   try {
     const userId = req.params.userid;
 
-    const { error, value } = profileUpdatedSchema.validate(req.body);
-
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
-    const { name, introduce, password, profileImgurl } = value;
-
-    if (!name && !introduce && !password && !profileImgurl) {
-      return res.status(400).json({ message: "수정 할 정보를 입력해 주세요." });
-    }
+    const { name, introduce, password, profileImgurl } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { userId: parseInt(userId) },

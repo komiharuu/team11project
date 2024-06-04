@@ -9,7 +9,10 @@ import signInSchma from "../validatiors/sign-in-status.js";
 
 const router = express.Router();
 
-// 회원가입 api
+router.get("/sign-up", (req, res) => {
+  res.render("sign-up"); //app.set homepage설정 그안에 /login.ejs폴더.
+});
+// 회원가입
 router.post("/sign-up", async (req, res, next) => {
   try {
     const { error, value } = signUpSchma.validate(req.body);
@@ -55,7 +58,8 @@ router.post("/sign-up", async (req, res, next) => {
       status: 201,
       message: "회원가입에 성공했습니다.",
       data: {
-        userId: user.id,
+        userId: user.userId,
+        // 회원가입시 user.userId로 해야 response에 userId가 조회됩니다.
         email: user.email,
         name: user.userInfo.name,
         introduce: user.userInfo.introduce,
@@ -102,18 +106,8 @@ router.post("/sign-in", async (req, res, next) => {
   // - **이메일로 조회되지 않거나 비밀번호가 일치하지 않는 경우** - “인증 정보가 유효하지 않습니다.”
   const user = await prisma.user.findFirst({ where: { email } });
 
-  if (!user) {
-    return res
-      .status(401)
-      .json({ status: 401, message: "인증 정보가 유효하지 않습니다." });
-  }
-
-  //비밀번호 일치
-  if (!(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({
-      status: 401,
-      message: "인증 정보가 유효하지 않습니다.",
-    });
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ message: "인증 정보가 유효하지 않습니다." });
   }
   //사용자에게 accessToken jwt발급
 
@@ -134,6 +128,7 @@ router.post("/sign-in", async (req, res, next) => {
   );
 
   const hashedRefreshToken = bcrypt.hashSync(refreshToken, 10);
+
   await prisma.refreshToken.upsert({
     where: {
       userId: user.userId,
@@ -150,7 +145,7 @@ router.post("/sign-in", async (req, res, next) => {
   return res.status(200).json({
     status: 200,
     message: "로그인 성공했습니다.",
-    data: { accessToken: accessToken, refreshToken: refreshToken },
+    data: { accessToken, refreshToken },
   });
 });
 
@@ -224,8 +219,6 @@ router.post("/verify-email", async (req, res) => {
     //  보낸 인증 번호로 프리즈마 데이터베이스를 저장합니다.
 
     // Save
-
-    //
     await sendEmail(email);
     // 이메일을 보내는 함수를 호출하여 인증 메일을 사용자 이메일 주소로 전송합니다.
 

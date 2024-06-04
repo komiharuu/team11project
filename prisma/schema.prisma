@@ -26,7 +26,7 @@ model User {
 
   posts    Post[]
   comments Comment[]
-  like Like[]
+  like     Like[]
 
   @@map("user")
 }
@@ -54,7 +54,6 @@ model RefreshToken {
 
   user User @relation(fields: [userId], references: [userId])
 
-
   @@map("refreshtoken")
 }
 
@@ -69,8 +68,8 @@ model Post {
 
   user     User      @relation(fields: [userId], references: [userId])
   comments Comment[]
-  like Like[]
-
+  like     Like[]
+// kakaouser Kakaouser @relation(fields: [kakaouserId], references: [kakaouserId])
   @@map("post")
 }
 
@@ -89,9 +88,9 @@ model Comment {
 }
 
 model Email {
-  verificationCode Int @unique
+  verificationCode Int      @unique
   email            String
-  createdAt DateTime @default(now())
+  createdAt        DateTime @default(now())
 
   @@map("email")
 }
@@ -106,6 +105,19 @@ model Like {
   post Post @relation(fields: [postId], references: [postId])
 
   @@unique([userId, postId])
+  @@map("like")
+}
 
-   @@map("like")
+model Kakaouser {
+  kakaouserId  Int      @id @default(autoincrement())
+  nickname     String
+  profileImage String
+  accountEmail String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+
+
+
+  @@map("kakaouser")
 }

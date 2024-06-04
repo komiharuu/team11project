@@ -7,7 +7,6 @@ import {PostValidator } from "../validatiors/update-post-status.js"
 const router = Router();
 
 
-
 // 게시글 등록 api
 router.post('/', accessToken, PostValidator, async (req, res, next) => {
     
@@ -195,11 +194,12 @@ router.delete("/:postId", accessToken, async (req, res, next) => {
 router.post('/likes/:postId', accessToken, async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user.userId;
+ 
   try {
   const existingLike = await prisma.like.findFirst({
-    where: {
+    where: { 
       userId,
-      postId:+postId
+      postId: +postId
     }
   });
   
