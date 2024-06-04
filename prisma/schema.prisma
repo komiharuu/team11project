@@ -26,6 +26,7 @@ model User {
 
   posts    Post[]
   comments Comment[]
+  like Like[]
 
   @@map("user")
 }
@@ -53,6 +54,7 @@ model RefreshToken {
 
   user User @relation(fields: [userId], references: [userId])
 
+
   @@map("refreshtoken")
 }
 
@@ -67,6 +69,7 @@ model Post {
 
   user     User      @relation(fields: [userId], references: [userId])
   comments Comment[]
+  like Like[]
 
   @@map("post")
 }
@@ -83,4 +86,26 @@ model Comment {
   user User @relation(fields: [userId], references: [userId])
 
   @@map("comment")
+}
+
+model Email {
+  verificationCode Int @unique
+  email            String
+  createdAt DateTime @default(now())
+
+  @@map("email")
+}
+
+model Like {
+  likeId    Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [userId])
+  post Post @relation(fields: [postId], references: [postId])
+
+  @@unique([userId, postId])
+
+   @@map("like")
 }

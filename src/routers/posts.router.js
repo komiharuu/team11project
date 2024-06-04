@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
-import accessMiddleware from '../middlewares/access-token.middleware.js';
-// // 3번째 줄 이거 사용자 인증기능할때 쓰세요
+import  accessToken  from '../middlewares/access-token.middleware.js';
 
 const router = Router();
 
+
+
 // 게시글 등록 api
-router.post('/', accessMiddleware, async (req, res, next) => {
+router.post('/', accessToken, async (req, res, next) => {
     
   const { recommendedArea, recommendationReason, imageurl } = req.body;
   const user = req.user;
@@ -34,6 +35,7 @@ router.post('/', accessMiddleware, async (req, res, next) => {
       },
     });
 
+
     // 클라이언트에 생성된 데이터를 반환합니다.
     return res.status(201).json({ data: posts });
   } catch (err) {
@@ -59,7 +61,6 @@ router.get('/',  async (req, res, next) => {
       select:  {
         userId: true,
         postId: true,
-        user: { select: { name: true } },
         recommendedArea: true,
         recommendationReason: true,
         imageurl: true,
@@ -67,6 +68,7 @@ router.get('/',  async (req, res, next) => {
         updatedAt: true
       }
     });
+
 
     res.status(200).json({ data: posts });
   } catch (err) {
@@ -77,34 +79,41 @@ router.get('/',  async (req, res, next) => {
 // // 게시글 상세조회 api
 router.get('/:postId',  async (req, res, next) => {
   try {
-    
+    const postId = parseInt(req.params.postId); 
 
-    // Prisma 쿼리 실행
-    const posts = await prisma.post.findFirst({
+    const post = await prisma.post.findUnique({
+      where: {
+        postId: postId
+      },
       select: {
-        post_Id: true,
-        recommended_area: true,
-        recommendation_reason: true,
-        image_url: true,
+        userId: true,
+        postId: true,
+        recommendedArea: true,
+        recommendationReason: true,
+        imageurl: true,
         createdAt: true,
-        updatedAt: true,
-        user: { select: { name: true } }
+        updatedAt: true
       }
     });
 
   
 
-    res.status(200).json({ data: posts });
+    if (!post) {
+      
+      return res.status(404).json({ message: '게시글이 존재하지 않습니다.' });
+    }
+
+    res.status(200).json({ data: post });
   } catch (err) {
     next(err);
   }
 });
 
 /** 게시글 수정 API */
-router.patch("/posts/:postId", accessMiddleware, async (req, res, next) => {
+router.patch("/:postId", accessToken, async (req, res, next) => {
   try {
-    // userId를 req.posts에서 받기
-    const { userId } = req.post;
+    // userId를
+    const { userId } = req.user;
 
     // postId를 req.params에서 받기
     const { postId } = req.params;
@@ -122,14 +131,7 @@ router.patch("/posts/:postId", accessMiddleware, async (req, res, next) => {
       where: {
         postId: +postId,
         userId: +userId,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
-      },
+      }, 
     });
 
     // 게시글이 없는 경우
@@ -158,11 +160,12 @@ router.patch("/posts/:postId", accessMiddleware, async (req, res, next) => {
   }
 });
 
+
 /** 게시글 삭제 API */
-router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
+router.delete("/:postId", accessToken, async (req, res, next) => {
   try {
-    // userId를 req.posts에서 받기
-    const { userId } = req.post;
+    // userId를 req.posts에서 받기- user로 해도 됩니다.
+    const { userId } = req.user;
 
     // postId를 req.params에서 받기
     const { postId } = req.params;
@@ -172,13 +175,6 @@ router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
       where: {
         postId: +postId,
         userId: +userId,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
       },
     });
 
@@ -196,10 +192,78 @@ router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
 
     return res
       .status(200)
-      .json({ message: "이럭서가 삭제되었습니다.", data: postId });
+      .json({ message: "게시글이 삭제되었습니다.", data: postId });
   } catch (error) {
     next(error);
   }
 });
 
+
+///////////////////////좋아요 구현중 다하고 밑으로 옮기기
+//게시물 좋아요 추가
+router.post('/likes/:postId', accessToken, async (req, res, next) => {
+  const { postId } = req.params;
+  const userId = req.user.userId;
+  try {
+  const existingLike = await prisma.like.findFirst({
+    where: {
+      userId,
+      postId:+postId
+    }
+  });
+  
+  if (existingLike) {
+    return res.status(400).json({
+      status: 400,
+      message: '이미 이 게시물에 좋아요를 눌렀습니다.'
+    });
+  }
+
+  
+    // 게시물 좋아요 추가
+    const like = await prisma.like.create({
+      data: {
+        userId,
+        postId:+postId
+      }
+    });
+
+    return res.status(201).json({
+      status: 201,
+      message: '게시물 좋아요가 추가되었습니다.',
+      data: like
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 게시물 좋아요 제거
+router.delete('/likes/:postId', accessToken, async (req, res, next) => {
+  const { postId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    // 게시물 좋아요 제거
+    await prisma.like.deleteMany({
+      where: {
+        postId :+postId,
+        userId
+      }
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: '게시물 좋아요가 제거되었습니다.'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+///////////////////////좋아요 구현중 끝
+
+
+
 export default router;
+
