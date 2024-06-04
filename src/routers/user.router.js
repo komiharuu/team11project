@@ -6,13 +6,12 @@ import accessToken from "../middlewares/access-token.middleware.js";
 
 const router = Router();
 
-
-
 /** 프로필 수정 API 구현 **/
 router.patch("/:userid", accessToken, async (req, res, next) => {
   try {
     const userId = req.params.userid;
-    const { name, introduce, password, passwordConfirm, profileImgurl } = req.body;
+    const { name, introduce, password, passwordConfirm, profileImgurl } =
+      req.body;
 
     // 유효성 검사
     if ((!name && !introduce && !password) || (password && !passwordConfirm)) {
@@ -53,7 +52,8 @@ router.patch("/:userid", accessToken, async (req, res, next) => {
           update: {
             name: name || (user.userInfo && user.userInfo.name),
             introduce: introduce || (user.userInfo && user.userInfo.introduce),
-            profileImgurl: profileImgurl || (user.userInfo && user.userInfo.profileImgurl),
+            profileImgurl:
+              profileImgurl || (user.userInfo && user.userInfo.profileImgurl),
           },
         },
       },
@@ -67,7 +67,7 @@ router.patch("/:userid", accessToken, async (req, res, next) => {
         email: updateUser.email,
         name: updateUser.userInfo.name,
         introduce: updateUser.userInfo.introduce,
-        profileImgurl : updateUser.userInfo.profileImgurl ,
+        profileImgurl: updateUser.userInfo.profileImgurl,
       },
     });
   } catch (err) {
