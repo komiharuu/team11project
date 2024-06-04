@@ -39,4 +39,34 @@ router.post("/:postId", accessToken, async (req, res, next) => {
   }
 });
 
+/** 댓글 조회 API **/
+router.get("/:postId", async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await prisma.post.findFirst({
+      where: {
+        postId: +postId,
+      },
+    });
+    if (!post)
+      return res.status(404).json({ message: "게시글이 존재하지 않습니다." });
+
+    const comments = await prisma.comment.findMany({
+      where: {
+        postId: +postId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "댓글이 조회되었습니다.", data: { comments } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
