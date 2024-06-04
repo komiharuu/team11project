@@ -3,6 +3,7 @@ import { prisma } from '../utils/prisma.util.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import validator from "validator";
+import passport from 'passport';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
 import sendEmail from '../constants/transport.constant.js';
 const router = express.Router();
@@ -66,7 +67,8 @@ router.post("/sign-up", async (req, res, next) => {
       status: 201,
       message: "회원가입에 성공했습니다.",
       data: {
-        userId: user.id,
+        userId: user.userId, 
+              // 회원가입시 user.userId로 해야 response에 userId가 조회됩니다.
         email: user.email,
         name: user.userInfo.name,
         introduce: user.userInfo.introduce,
@@ -243,10 +245,6 @@ router.post('/verify-email', async (req, res) => {
 
  //  보낸 인증 번호로 프리즈마 데이터베이스를 저장합니다. 
 
-    // Save
-  
-
-    // 
     await sendEmail(email);
  // 이메일을 보내는 함수를 호출하여 인증 메일을 사용자 이메일 주소로 전송합니다.
 
@@ -301,6 +299,24 @@ router.get('/verify-email/:email', async (req, res) => {
     res.status(500).json({ message: '이메일 인증 중 오류가 발생했습니다.' });
   }
 });
+
+
+// //* 카카오로 로그인하기 라우터 ***********************
+// //? /kakao로 요청오면, 카카오 로그인 페이지로 가게 되고, 카카오 서버를 통해 카카오 로그인을 하게 되면, 다음 라우터로 요청한다.
+// router.get('/kakao', passport.authenticate('kakao'));
+
+// //? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+// router.get(
+//    '/kakao/callback',
+//    //? 그리고 passport 로그인 전략에 의해 kakaoStrategy로 가서 카카오계정 정보와 DB를 비교해서 회원가입시키거나 로그인 처리하게 한다.
+//    passport.authenticate('kakao', {
+//       failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
+//    }),
+//    // kakaoStrategy에서 성공한다면 콜백 실행
+//    (req, res) => {
+//       res.redirect('/');
+//    },
+// );
 
 
 
