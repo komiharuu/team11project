@@ -69,4 +69,92 @@ router.get("/:postId", async (req, res, next) => {
   }
 });
 
+/** 댓글 수정 api */
+router.patch("/:commentId", accessToken, async (req, res, next) => {
+  try {
+    // userID 받기
+    const { userId } = req.user;
+
+    // commentId 받기
+    const { commentId } = req.params;
+
+    // content 받기
+    const { content } = req.body;
+
+    // 댓글 내용이 없는 경우
+    if (!content) {
+      return res.status(400).json({ message: "댓글을 입력해주세요." });
+    }
+
+    // 수정할 댓글 조회
+    const comment = await prisma.comment.findFirst({
+      where: {
+        userId: +userId,
+        commentId: +commentId,
+      },
+    });
+
+    // 댓글이 없는 경우
+    if (!comment) {
+      return res.status(400).json({ message: "댓글이 존재하지 않습니다." });
+    }
+
+    // 댓글 수정하기
+    const patchComment = await prisma.comment.update({
+      where: {
+        commentId: +commentId,
+      },
+      data: {
+        content,
+        updatedAt: new Date(),
+      },
+    });
+
+    // 수정된 댓글 반환
+    return res
+      .status(200)
+      .json({ message: "댓글 수정이 완료되었습니다.", date: patchComment });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+/** 댓글 삭제 api */
+router.delete('/:commentId', accessToken, async(req, res, next) => {
+  try {
+    // userId 받기
+    const { userId } = req.user;
+
+    // commentId 받기
+    const { commentId } = req.params;
+    
+    // comment 조회
+    const comment = await prisma.comment.findFirst({
+      where: {
+        userId: +userId,
+        commentId: +commentId,
+      },
+    });
+
+    // comment가 없는 경우
+    if (!comment) {
+      return res.status(400).json({ message: '댓글이 존재하지 않습니다.'});
+    };
+    
+    // comment 삭제하기
+    await prisma.comment.delete({
+      where: {
+        commentId: +commentId,
+      },
+    });
+
+    // 삭제된 commentId 반환
+    return res.status(200).json({ message: '댓글이 삭제되었습니다.', data: commentId });
+
+  } catch(error){
+    next(error);
+  }
+});
+
 export default router;
