@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 //회원가입 Joi 정의
-const signUpSchma = Joi.object({
+const signInSchma = Joi.object({
   email: Joi.string()
     .email({ tlds: { allow: ["com", "net", "kr"] } })
     .required()
@@ -26,4 +26,4 @@ const signUpSchma = Joi.object({
     .messages({ "string.url": "프로필 이미지 URL이 유효하지 않습니다." }),
 });
 
-export default signUpSchma;
+export default signInSchma;

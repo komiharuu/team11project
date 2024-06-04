@@ -2,10 +2,10 @@ import express from "express";
 import { prisma } from "../utils/prisma.util.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import validator from "validator";
 import { requireRefreshToken } from "../middlewares/require-refresh-token.middleware.js";
 import sendEmail from "../constants/transport.constant.js";
-import signUpSchma from "../validatiors/auth-status.js";
+import signUpSchma from "../validatiors/sign-up-status.js";
+import signInSchma from "../validatiors/sign-in-status.js";
 
 const router = express.Router();
 
@@ -71,12 +71,18 @@ router.post("/sign-up", async (req, res, next) => {
 
 //주소 치면 login.ejs설정화면이동!
 //하는중
-router.get("/sign-in", (req, res) => {
-  res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
-});
+//router.get("/sign-in", (req, res) => {
+// res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
+//});
 //로그인 API
 router.post("/sign-in", async (req, res, next) => {
-  const { email, password } = req.body;
+  const { error, value } = signInSchma.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+  const { email, password } = value;
+
   // - **로그인 정보 중 하나라도 빠진 경우** - “OOO을 입력해 주세요.”
   if (!email || !password) {
     const missingFields = [];
@@ -89,15 +95,7 @@ router.post("/sign-in", async (req, res, next) => {
 
     return res.status(401).json({
       status: 401,
-      message: `${missingFields} 입력해 주세요.`,
-    });
-  }
-  // - **이메일 형식에 맞지 않는 경우** - “이메일 형식이 올바르지 않습니다.”
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({
-      status: 400,
-      message: "이메일 형식이 올바르지 않습니다.",
+      message: `${missingFields.join("")} 입력해 주세요.`,
     });
   }
 
