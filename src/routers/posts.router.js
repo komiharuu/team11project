@@ -199,7 +199,7 @@ router.delete("/:postId", accessToken, async (req, res, next) => {
 });
 
 
-///////////////////////좋아요 구현중 다하고 밑으로 옮기기
+//좋아요 생성, 삭제 기능 구현중
 //게시물 좋아요 추가
 router.post('/likes/:postId', accessToken, async (req, res, next) => {
   const { postId } = req.params;
@@ -244,6 +244,20 @@ router.delete('/likes/:postId', accessToken, async (req, res, next) => {
   const userId = req.user.userId;
 
   try {
+   //게시물 존재 유무
+   const existingPost = await prisma.post.findUnique({
+    where: {
+      postId: +postId
+    }
+  });
+  if (!existingPost) {
+    return res.status(404).json({
+      status: 404,
+      message: '해당 게시물이 존재하지 않습니다.'
+    });
+  }
+
+
     // 게시물 좋아요 제거
     await prisma.like.deleteMany({
       where: {
@@ -260,9 +274,6 @@ router.delete('/likes/:postId', accessToken, async (req, res, next) => {
     next(err);
   }
 });
-
-///////////////////////좋아요 구현중 끝
-
 
 
 export default router;
