@@ -103,21 +103,16 @@ model Like {
 
   user User @relation(fields: [userId], references: [userId])
   post Post @relation(fields: [postId], references: [postId])
-
   @@unique([userId, postId])
   @@map("like")
 }
 
 model Kakaouser {
-  kakaouserId  Int      @id @default(autoincrement())
-  nickname     String
-  profileImage String
-  accountEmail String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-
-
+ id        Int     @id @default(autoincrement())
+  email     String  
+  name    String
+  snsId     Int
+  provider  String
 
   @@map("kakaouser")
 }

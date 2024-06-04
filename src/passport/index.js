@@ -1,22 +1,29 @@
 import passport from 'passport';
-import local from './localStrategy';
-import kakao from './kakaoStrategy';
-import naver from './naverStrategy';
+import { prisma } from '../utils/prisma.util.js';
+import kakaoStrategy from './kakaoStrategy.js';
 
-import { findOne } from '../models/user';
-
-export default () => {
-    serializeUser((user, done) => {
-        done(null, user.userid);
-    });
-    
-    deserializeUser((userid, done) => {
-        findOne({ where: { userid } })
-            .then(user => done(null, user))
-            .catch(err => done(err));
+export const passportConfig = () => {
+    passport.serializeUser((kakaouser, done) => {
+        done(null, kakaouser.id);
     });
 
-   
-    kakao();
-   
-}
+    passport.deserializeUser((id, done) => {
+        prisma.kakaouser.findUnique({ where: { id } })
+            .then(kakaouser => {
+                if (kakaouser) {
+                    console.log('User found:', kakaouser);
+                    done(null, kakaouser);
+                } else {
+                    console.log('User not found');
+                    done(null, false);
+                }
+            })
+            .catch(err => {
+                console.error('Error in deserializeUser:', err);
+                done(err);
+            });
+    });
+
+    passport.use('kakao', kakaoStrategy);
+};
+
