@@ -1,88 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Destinations</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>travel</title>
 </head>
 <body>
-    <h1>여행을 떠나요</h1>
 
-    <form id="destinationForm">
-        <label for="recommendedArea">추천 지역</label><br>
-        <input type="text" id="recommendedArea" name="recommendedArea"><br><br>
-        <label for="recommendationReason">추천 이유</label><br>
-        <textarea id="recommendationReason" name="recommendationReason"></textarea><br><br>
-        <label for="imageurl">이미지 링크</label><br>
-        <input type="text" id="imageurl" name="imageurl"><br><br>
-        <button type="submit">등록하기</button>
-    </form>
+  <h2>여행지 추천하기</h2>
 
-    <hr>
+  <form id="destinationForm">
+    <label for="recommendedArea">추천 지역</label><br>
+    <input type="text" id="recommendedArea" name="recommendedArea"><br><br>
+    <label for="recommendationReason">추천 이유</label><br>
+    <textarea id="recommendationReason" name="recommendationReason"></textarea><br><br>
+    <label for="imageurl">이미지 링크</label><br>
+    <input type="text" id="imageurl" name="imageurl"><br><br>
+    <button type="submit">등록하기</button>
+  </form>
 
-    <h2>여행지 조회하기</h2>
-    <div id="destinationsContainer"></div>
+  <hr>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        const accessToken = "custom-secret-key"; // Replace with your actual token
+  <h2>여행지 조회하기</h2>
+  <div id="destinationsContainer"></div>
 
-        // Function to fetch and display all destinations
-        async function fetchDestinations() {
-            try {
-                const response = await axios.get('http://localhost:3015/posts', {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
-                });
-                const destinations = response.data.data;
-                const destinationsContainer = document.getElementById('destinationsContainer');
-                destinationsContainer.innerHTML = '';
-                destinations.forEach(destination => {
-                    const destinationElement = document.createElement('div');
-                    destinationElement.innerHTML = `
-                    <h3>${destination.recommendedArea}</h3>
-                    <p><strong>작성자:</strong> ${destination.user.name}</p> 
-                        <p><strong>추천 이유:</strong> ${destination.recommendationReason}</p>
-                        <p><strong></strong> <img src="${destination.imageurl}" alt="Destination Image" style="max-width: 200px;"></p>
-                        <hr>
-                    `;
-                    destinationsContainer.appendChild(destinationElement);
-                });
-            } catch (error) {
-                console.error('사이트 오류:', error);
-                alert('에러가 발생했습니다');
-            }
-        }
-
-        // Function to handle form submission
-        document.getElementById('destinationForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            const destinationData = {};
-            formData.forEach((value, key) => {
-                destinationData[key] = value;
-            });
-
-            try {
-                const response = await axios.post('http://localhost:3015/posts', destinationData, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
-                });
-                console.log('Destination added successfully:', response.data);
-                // Clear the form
-                this.reset();
-                // Refresh destinations
-                fetchDestinations();
-            } catch (error) {
-                console.error('작성 오류:', error);
-                alert('등록에 실패했습니다');
-            }
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // Function to fetch and display all destinations
+    async function fetchDestinations() {
+      try {
+        const response = await axios.get('http://localhost:3015/posts');
+        const destinations = response.data.data;
+        const destinationsContainer = document.getElementById('destinationsContainer');
+        destinationsContainer.innerHTML = '';
+        destinations.forEach(destination => {
+          const destinationElement = document.createElement('div');
+          destinationElement.innerHTML = `
+            <h3>${destination.recommendedArea}</h3>
+            <p><strong>추천 이유:</strong> ${destination.recommendationReason}</p>
+            <p><strong></strong> <img src="${destination.imageurl}" alt="Destination Image" style="max-width: 200px;"></p>
+            <hr>
+          `;
+          destinationsContainer.appendChild(destinationElement);
         });
+      } catch (error) {
+        console.error('사이트 오류:', error);
+        alert('에러가 발생했습니다');
+      }
+    }
 
-        // Initial fetch of destinations when the page loads
+    // Function to handle form submission
+    document.getElementById('destinationForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      const destinationData = {};
+      formData.forEach((value, key) => {
+        destinationData[key] = value;
+      });
+
+      try {
+        const response = await axios.post('http://localhost:3015/posts', destinationData);
+        console.log('게시글이 성공적으로 등록되었습니다', response.data);
+        // Clear the form
+        this.reset();
+        // Refresh destinations
         fetchDestinations();
-    </script>
+      } catch (error) {
+        console.error('작성 오류:', error);
+        alert('등록에 실패했습니다');
+      }
+    });
+
+
+    // Initial fetch of destinations when the page loads
+    fetchDestinations();
+  </script>
 </body>
 </html>

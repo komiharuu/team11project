@@ -53,7 +53,8 @@ model RefreshToken {
 
   user User @relation(fields: [userId], references: [userId])
 
-  @@map("refresh_token")
+
+  @@map("refreshtoken")
 }
 
 model Post {
@@ -83,4 +84,12 @@ model Comment {
   user User @relation(fields: [userId], references: [userId])
 
   @@map("comment")
+}
+
+model Email {
+  verificationCode Int @unique
+  email            String
+  createdAt DateTime @default(now())
+
+  @@map("email")
 }

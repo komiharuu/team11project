@@ -1,29 +1,19 @@
 import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
-import accessMiddleware from '../middlewares/auth.middleware.js';
-// // 3번째 줄 이거 사용자 인증기능할때 쓰세요
+import  accessToken  from '../middlewares/access-token.middleware.js';
+import {PostValidator } from "../validatiors/update-post-status.js"
+
 
 const router = Router();
 
 // 게시글 등록 api
-router.post('/', accessMiddleware, async (req, res, next) => {
+router.post('/', accessToken, PostValidator, async (req, res, next) => {
     
   const { recommendedArea, recommendationReason, imageurl } = req.body;
   const user = req.user;
   try {
     // 필수 필드가 모두 제공되었는지 확인합니다.
-    if (!recommendedArea) {
-      return res.status(400).json({ message: '추천 지역을 입력해 주세요.' });
-    }
-    if (!recommendationReason) {
-      return res.status(400).json({ message: '추천 이유를 입력해 주세요.' });
-    }
-    if (!imageurl) {
-      return res.status(400).json({ message: '여행지 사진을 등록해 주세요.' });
-    }
-
-
-
+ 
     // // Post 데이터를 데이터베이스에 삽입합니다.
     const posts = await prisma.post.create({
       data: {
@@ -33,7 +23,6 @@ router.post('/', accessMiddleware, async (req, res, next) => {
         imageurl: imageurl,
       },
     });
-
 
 
     // 클라이언트에 생성된 데이터를 반환합니다.
@@ -61,7 +50,6 @@ router.get('/',  async (req, res, next) => {
       select:  {
         userId: true,
         postId: true,
-        user: { select: { name: true } },
         recommendedArea: true,
         recommendationReason: true,
         imageurl: true,
@@ -70,7 +58,6 @@ router.get('/',  async (req, res, next) => {
       }
     });
 
-   
 
     res.status(200).json({ data: posts });
   } catch (err) {
@@ -81,34 +68,41 @@ router.get('/',  async (req, res, next) => {
 // // 게시글 상세조회 api
 router.get('/:postId',  async (req, res, next) => {
   try {
-    
+    const postId = parseInt(req.params.postId); 
 
-    // Prisma 쿼리 실행
-    const posts = await prisma.post.findFirst({
+    const post = await prisma.post.findUnique({
+      where: {
+        postId: postId
+      },
       select: {
-        post_Id: true,
-        recommended_area: true,
-        recommendation_reason: true,
-        image_url: true,
+        userId: true,
+        postId: true,
+        recommendedArea: true,
+        recommendationReason: true,
+        imageurl: true,
         createdAt: true,
-        updatedAt: true,
-        user: { select: { name: true } }
+        updatedAt: true
       }
     });
 
   
 
-    res.status(200).json({ data: posts });
+    if (!post) {
+      
+      return res.status(404).json({ message: '게시글이 존재하지 않습니다.' });
+    }
+
+    res.status(200).json({ data: post });
   } catch (err) {
     next(err);
   }
 });
 
 /** 게시글 수정 API */
-router.patch("/posts/:postId", accessMiddleware, async (req, res, next) => {
+router.patch("/:postId", accessToken, async (req, res, next) => {
   try {
-    // userId를 req.posts에서 받기
-    const { userId } = req.post;
+    // userId를
+    const { userId } = req.user;
 
     // postId를 req.params에서 받기
     const { postId } = req.params;
@@ -126,14 +120,7 @@ router.patch("/posts/:postId", accessMiddleware, async (req, res, next) => {
       where: {
         postId: +postId,
         userId: +userId,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
-      },
+      }, 
     });
 
     // 게시글이 없는 경우
@@ -162,11 +149,12 @@ router.patch("/posts/:postId", accessMiddleware, async (req, res, next) => {
   }
 });
 
+
 /** 게시글 삭제 API */
-router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
+router.delete("/:postId", accessToken, async (req, res, next) => {
   try {
-    // userId를 req.posts에서 받기
-    const { userId } = req.post;
+    // userId를 req.posts에서 받기- user로 해도 됩니다.
+    const { userId } = req.user;
 
     // postId를 req.params에서 받기
     const { postId } = req.params;
@@ -176,13 +164,6 @@ router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
       where: {
         postId: +postId,
         userId: +userId,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
       },
     });
 
@@ -200,10 +181,12 @@ router.delete("/posts/:postId", accessMiddleware, async (req, res, next) => {
 
     return res
       .status(200)
-      .json({ message: "이럭서가 삭제되었습니다.", data: postId });
+      .json({ message: "게시글이 삭제되었습니다.", data: postId });
   } catch (error) {
     next(error);
   }
 });
 
+
 export default router;
+
