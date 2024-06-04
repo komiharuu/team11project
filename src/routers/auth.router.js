@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { prisma } from '../utils/prisma.util.js';
 import bcrypt from 'bcrypt';
@@ -306,3 +305,4 @@ router.get('/verify-email/:email', async (req, res) => {
 
 
 export default router;
+
