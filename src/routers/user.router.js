@@ -68,7 +68,7 @@ router.post("/sign-up", async (req, res, next) => {
         userId: user.id,
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
-      { expiresIn: "12h" },
+      { expiresIn: process.env.JWT_ACCESS_EXPIRE },
     );
 
     res.cookie("authorization", `Bearer ${token}`);
@@ -84,7 +84,6 @@ router.post("/sign-up", async (req, res, next) => {
         profileImgurl: user.userInfo.profileImgurl,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        accessToken: token,
       },
     });
   } catch (err) {
@@ -93,7 +92,7 @@ router.post("/sign-up", async (req, res, next) => {
 });
 
 /** 프로필 수정 API 구현 **/
-router.patch("/user/:userid", accessToken, async (req, res, next) => {
+router.patch("/auth/:userid", accessToken, async (req, res, next) => {
   try {
     const userId = req.params.userid;
     const { name, introduce, password, passwordConfirm } = req.body;
