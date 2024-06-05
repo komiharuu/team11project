@@ -108,14 +108,15 @@ model Like {
   @@map("like")
 }
 
-model Kakaouser {
+model Snsuser {
  id        Int     @id @default(autoincrement())
   email     String  
   name    String
-  snsId     Int
+   image    String
+  snsId     String
   provider  String
 
-  @@map("kakaouser")
+  @@map("snsuser")
 }
 
 model Follows {
