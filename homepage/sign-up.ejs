@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,72 +71,68 @@
         outline: none;
       }
     </style>
-    
+  </head>
+  <body>
+    <div class="container">
+      <h2>회원가입! 여행을 떠나요!</h2>
+      <input id="email" type="email" placeholder="이메일" /><br />
+      <input id="password" type="password" placeholder="비밀번호" /><br />
+      <input
+        id="passwordConfirm"
+        type="password"
+        placeholder="비밀번호 확인"
+      /><br />
+      <input id="name" type="text" placeholder="이름" /><br />
+      <input id="introduce" type="text" placeholder="자기소개" /><br />
+      <input id="profileImgurl" type="text" placeholder="이미지 URL" /><br />
+      <button id="registerBtn">가입하기</button>
+    </div>
 
-  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      const email = document.querySelector("#email");
+      const password = document.querySelector("#password");
+      const passwordConfirm = document.querySelector("#passwordConfirm");
+      const name = document.querySelector("#name");
+      const introduce = document.querySelector("#introduce");
+      const profileImgurl = document.querySelector("#profileImgurl");
+      const registerBtn = document.querySelector("#registerBtn");
 
-</head>
-<body>
-  <div class="container">
-    <h2>회원가입! 여행을 떠나요!</h2>
-    <input id="email" type="email" placeholder="이메일"><br>
-    <input id="password" type="password" placeholder="비밀번호"><br>
-    <input id="passwordConfirm" type="password" placeholder="비밀번호 확인"><br>
-    <input id="name" type="name" placeholder="이름"><br>
-    <input id="introduce" type="introduce" placeholder="자기소개"><br>
-    <input id="profileImgurl" type="profileImgurl" placeholder="이미지url"><br>
-    <button>가입하기</button>
-   
-  
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    const email = document.querySelector("#email");
-    const password = document.querySelector("#password");
-    const passwordConfirm = document.querySelector("#passwordConfirm");
-    const name = document.querySelector("#name");
-    const introduce = document.querySelector("#introduce");
-    const profileImgurl = document.querySelector("#profileImgurl");
-    const registerBtn = document.querySelector("button");
-    
-    registerBtn.addEventListener("click", register);
+      registerBtn.addEventListener("click", register);
 
-    function register(){
+      function register() {
         const req = {
-        email: email.value,
-        password: password.value,
-        passwordConfirm:passwordConfirm.value,
-        name:name.value,
-        introduce:introduce.value,
-        profileImgurl:profileImgurl.value
-      };
-      fetch("/auth/sign-up", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req),
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 201) {
-          alert(data.message);
-         
-         // 로그인 성공 후 리다이렉트 (예: 홈페이지로)
-          window.location.href = "/posts";
-        } else {
-          alert(data.message);
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("로그인 중 오류가 발생했습니다.");
-      });
-      
-    }
+          email: email.value,
+          password: password.value,
+          passwordConfirm: passwordConfirm.value,
+          name: name.value,
+          introduce: introduce.value,
+          profileImgurl: profileImgurl.value,
+        };
 
-    
+        fetch("/auth/sign-up", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === 201) {
+              alert(data.message);
 
-   
-  </script>
-</body>
+              // 로그인 성공 후 리다이렉트 (예: 홈페이지로)
+              window.location.href = "/posts";
+            } else {
+              alert(data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("로그인 중 오류가 발생했습니다.");
+          });
+      }
+    </script>
+  </body>
 </html>
