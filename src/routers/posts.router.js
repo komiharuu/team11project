@@ -5,6 +5,36 @@ import {PostValidator } from "../validatiors/update-post-status.js"
 
 const router = Router();
 
+//게시물 상세 렌더링 조회 
+router.get('/:postId', async (req, res, next) => {
+  try {
+    const postId = parseInt(req.params.postId);
+
+    // 게시물 조회
+    const post = await prisma.post.findUnique({
+      where: {
+        postId: postId
+      },
+      select: {
+        userId: true,
+        postId: true,
+        recommendedArea: true,
+        recommendationReason: true,
+        imageurl: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
+
+    if (!post) {
+      return res.status(404).json({ message: '게시글이 존재하지 않습니다.' });
+    }
+
+    res.render('post-detail', { post: post }); // post-detail.ejs로 post 객체를 전달하여 렌더링
+  } catch (err) {
+    next(err);
+  }
+});
 
 //게시판 페이지 렌더링 
 router.get('/', async (req, res, next) => {
@@ -93,7 +123,7 @@ router.get('/',  async (req, res, next) => {
   }
 });
 
-// // 게시글 상세조회 api
+// 게시글 상세조회 api
 router.get('/:postId',  async (req, res, next) => {
   try {
     const postId = parseInt(req.params.postId); 

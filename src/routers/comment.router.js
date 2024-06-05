@@ -4,6 +4,7 @@ import accessToken from "../middlewares/access-token.middleware.js";
 
 const router = Router();
 
+
 /** 댓글 작성 API **/
 router.post("/:postId", accessToken, async (req, res, next) => {
   try {

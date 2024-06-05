@@ -270,17 +270,17 @@ router.get("/verify-email/:email", async (req, res) => {
 
 
 //* 카카오로 로그인하기 라우터 ***********************
-router.get('/kakao', passport.authenticate('kakao'));
+// router.get('/kakao', passport.authenticate('kakao'));
 
-//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
-router.get('/kakao/callback', passport.authenticate('kakao', {
-      failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
-   }),
-   // kakaoStrategy에서 성공한다면 콜백 실행
-   (req, res) => {
-      res.redirect('/');
-   },
-);
+// //? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+// router.get('/kakao/callback', passport.authenticate('kakao', {
+//       failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
+//    }),
+//    // kakaoStrategy에서 성공한다면 콜백 실행
+//    (req, res) => {
+//       res.redirect('/');
+//    },
+// );
 
 
 
