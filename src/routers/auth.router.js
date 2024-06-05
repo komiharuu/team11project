@@ -5,19 +5,19 @@ import jwt from "jsonwebtoken";
 import passport from "passport";
 import { requireRefreshToken } from "../middlewares/require-refresh-token.middleware.js";
 import sendEmail from "../constants/transport.constant.js";
-import { SignupValidator} from "../validatiors/sign-up-status.js";
-import {SigninValidator} from "../validatiors/sign-in-status.js";
+import { SignupValidator } from "../validatiors/sign-up-status.js";
+import { SigninValidator } from "../validatiors/sign-in-status.js";
 
 const router = express.Router();
 
-router.get("/sign-up", (req, res) => {
+router.get("/sign-up", SignupValidator, (req, res) => {
   res.render("sign-up"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 // 회원가입
-router.post("/sign-up", SignupValidator , async (req, res, next) => {
+router.post("/sign-up", async (req, res, next) => {
   try {
     const { email, password, passwordConfirm, profileImgurl, name, introduce } =
-    req.body;
+      req.body;
 
     const isExistUser = await prisma.user.findFirst({ where: { email } });
 
@@ -57,15 +57,18 @@ router.post("/sign-up", SignupValidator , async (req, res, next) => {
   }
 });
 
-
 //하는중
 router.get("/sign-in", (req, res) => {
-res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
+  res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 //로그인 API
 router.post("/sign-in", SigninValidator, async (req, res, next) => {
+  const { error, value } = signInSchema.validate(req.body);
 
-  const { email, password } = req.body;
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+  const { email, password } = value;
 
   // - **로그인 정보 중 하나라도 빠진 경우** - “OOO을 입력해 주세요.”
   // if (!email || !password) {
@@ -241,33 +244,19 @@ router.get("/verify-email/:email", async (req, res) => {
   }
 });
 
+//* 카카오로 로그인하기 라우터 ***********************
+router.get("/kakao", passport.authenticate("kakao"));
 
-
-// 카카오 로그인
-router.get('/kakao', passport.authenticate('kakao'));
-
-
-router.get('/kakao/callback', passport.authenticate('kakao', {
-      failureRedirect: '/', 
-   }),
-  
-   (req, res) => {
-      res.redirect('/');
-   },
-);
-
-// 네이버 로그인
-router.get('/naver', passport.authenticate('naver'));
-
-//? 위에서 naver 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
-router.get('/naver/callback', passport.authenticate('naver', {
-      failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
-   }),
-   // kakaoStrategy에서 성공한다면 콜백 실행
-   (req, res) => { 
-      res.redirect('/');
-
-   },
+//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao", {
+    failureRedirect: "/", // kakaoStrategy에서 실패한다면 실행
+  }),
+  // kakaoStrategy에서 성공한다면 콜백 실행
+  (req, res) => {
+    res.redirect("/");
+  },
 );
 
 export default router;

@@ -2,61 +2,90 @@ import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
 import bcrypt from "bcrypt";
 import accessToken from "../middlewares/access-token.middleware.js";
-import {ProfileValidator} from "../validatiors/profileUpdatedSchema.js";
+import { ProfileValidator } from "../validatiors/profileUpdatedSchema.js";
 
 const router = Router();
 
 /** 프로필 수정 API 구현 **/
-router.patch("/:userid", accessToken, ProfileValidator, async (req, res, next) => {
+router.patch(
+  "/:userid",
+  accessToken,
+  ProfileValidator,
+  async (req, res, next) => {
+    try {
+      const userId = req.params.userid;
+      const { name, introduce, email, password, profileImgurl } = req.body;
+      const user = await prisma.user.findUnique({
+        where: { userId: parseInt(userId) },
+      });
+      if (!user) {
+        return res.status(404).json({ message: "사용자가 존재하지 않습니다." });
+      }
+      const userDataUpdate = {};
+      if (name) userDataUpdate.name = user.name;
+      if (introduce) userDataUpdate.introduce = user.introduce;
+      if (password) {
+        // 비밀번호 해시화하기
+        const hashedPassword = await bcrypt.hash(password, 10);
+        userDataUpdate.password = hashedPassword;
+      }
+      //프로필 수정
+      const updateUser = await prisma.user.update({
+        where: { userId: parseInt(userId) },
+        data: {
+          ...userDataUpdate,
+          userInfo: {
+            update: {
+              name: name || (user.userInfo && user.userInfo.name),
+              introduce:
+                introduce || (user.userInfo && user.userInfo.introduce),
+              profileImgurl:
+                profileImgurl || (user.userInfo && user.userInfo.profileImgurl),
+            },
+          },
+        },
+        include: { userInfo: true },
+      });
+      return res.status(200).json({
+        status: 200,
+        message: "프로필이 수정되었습니다.",
+        data: {
+          email: updateUser.email,
+          name: updateUser.userInfo.name,
+          introduce: updateUser.userInfo.introduce,
+          profileImgurl: updateUser.userInfo.profileImgurl,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+/** 유저 조회 API 구현 **/
+router.get("/:userid", accessToken, async (req, res, next) => {
   try {
     const userId = req.params.userid;
-
-    const { name, introduce, email, password, profileImgurl } = req.body;
+    const { email, password, passwordConfirm } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { userId: parseInt(userId) },
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "사용자가 존재하지 않습니다." });
-    }
-
-    const userDataUpdate = {};
-
-    if (name) userDataUpdate.name = user.name;
-    if (introduce) userDataUpdate.introduce = user.introduce;
-
-    if (password) {
-      // 비밀번호 해시화하기
-      const hashedPassword = await bcrypt.hash(password, 10);
-      userDataUpdate.password = hashedPassword;
-    }
-
-    //프로필 수정
-    const updateUser = await prisma.user.update({
-      where: { userId: parseInt(userId) },
-      data: {
-        ...userDataUpdate,
-        userInfo: {
-          update: {
-            name: name || (user.userInfo && user.userInfo.name),
-            introduce: introduce || (user.userInfo && user.userInfo.introduce),
-            profileImgurl:
-              profileImgurl || (user.userInfo && user.userInfo.profileImgurl),
-          },
-        },
-      },
       include: { userInfo: true },
     });
 
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "사용자가 존재하지 않습니다." });
+    }
+
     return res.status(200).json({
-      status: 200,
-      message: "프로필이 수정되었습니다.",
-      data: {
-        email: updateUser.email,
-        name: updateUser.userInfo.name,
-        introduce: updateUser.userInfo.introduce,
-        profileImgurl: updateUser.userInfo.profileImgurl,
+      status: "success",
+      profile: {
+        email: user.email,
+        name: user.userInfo.name,
+        introduce: user.userInfo.introduce,
+        profileImgurl: user.userInfo.profileImgurl,
       },
     });
   } catch (err) {

@@ -5,8 +5,10 @@ const signUpSchema = Joi.object({
   email: Joi.string()
     .email({ tlds: { allow: ["com", "net", "kr"] } })
     .required()
-    .messages({ "string.email": "이메일 형식이 올바르지 않습니다.",
-    "any.required": '이메일을 입력해주세요' }),
+    .messages({
+      "string.email": "이메일 형식이 올바르지 않습니다.",
+      "any.required": "이메일을 입력해주세요",
+    }),
   name: Joi.string()
     .required()
     .messages({ "any.required": "이름 형식이 올바르지 않습니다." }),
@@ -17,10 +19,10 @@ const signUpSchema = Joi.object({
     "string.base": "비밀번호는 문자열이어야 합니다.",
     "string.min": "비밀번호는 6자리 이상이어야 합니다.",
   }),
-  passwordConfirm: Joi.any()
-    .valid(Joi.ref("password"))
-    .required()
-    .messages({ "any.only": "두 비밀번호가 일치하지 않습니다.", "any.required": "비밀번호를 확인해주세요."  }),
+  passwordConfirm: Joi.any().valid(Joi.ref("password")).required().messages({
+    "any.only": "두 비밀번호가 일치하지 않습니다.",
+    "any.required": "비밀번호를 확인해주세요.",
+  }),
   profileImgurl: Joi.string()
     .uri()
     .required()
