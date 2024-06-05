@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-//f로그인 Joi 정의
+//로그인 Joi 정의
 const signInSchma = Joi.object({
   email: Joi.string()
     .email({ tlds: { allow: ["com", "net", "kr"] } })

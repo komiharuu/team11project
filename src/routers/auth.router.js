@@ -2,6 +2,7 @@ import express from "express";
 import { prisma } from "../utils/prisma.util.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import passport from "passport";
 import { requireRefreshToken } from "../middlewares/require-refresh-token.middleware.js";
 import sendEmail from "../constants/transport.constant.js";
 import signUpSchma from "../validatiors/sign-up-status.js";
@@ -24,16 +25,16 @@ router.post("/sign-up", async (req, res, next) => {
     const { email, password, passwordConfirm, profileImgurl, name, introduce } =
       value;
 
-    if (
-      !email ||
-      !password ||
-      !passwordConfirm ||
-      !name ||
-      !introduce ||
-      !profileImgurl
-    ) {
-      return res.status(400).json({ message: "모든 필드를 입력해 주세요." });
-    }
+    // if (
+    //   !email ||
+    //   !password ||
+    //   !passwordConfirm ||
+    //   !name ||
+    //   !introduce ||
+    //   !profileImgurl
+    // ) {
+    //   return res.status(400).json({ message: "모든 필드를 입력해 주세요." });
+    // }
 
     const isExistUser = await prisma.user.findFirst({ where: { email } });
 
@@ -230,11 +231,6 @@ router.post("/verify-email", async (req, res) => {
   }
 });
 
-// 서버에서 인증번호를 알고있어야한다. 그래서 스키마를 추가했습니다.
-// 서버가 열렸을때 메모리 임시저장
-// 데이터베이스 따로 생성 email과 인증코드
-// 인증번호 발급. 그때부터 알아야 한다. 개발 처음부터 스키마 짜는 것이 좋다.
-
 //이메일 인증번호 확인 api
 
 router.get("/verify-email/:email", async (req, res) => {
@@ -242,7 +238,7 @@ router.get("/verify-email/:email", async (req, res) => {
     const { verificationCode } = req.body;
     const email = req.params.email;
 
-    // Check if the provided verification code and email exist in the database
+    //이메일이 데이터베이스에 존재하는지 확인합니다.
     const record = await prisma.email.findFirst({
       where: { email },
       orderBy: { createdAt: "desc" },
@@ -269,11 +265,24 @@ router.get("/verify-email/:email", async (req, res) => {
 
 
 
-//* 카카오로 로그인하기 라우터 ***********************
+// 카카오 로그인
 router.get('/kakao', passport.authenticate('kakao'));
 
-//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+
 router.get('/kakao/callback', passport.authenticate('kakao', {
+      failureRedirect: '/', 
+   }),
+  
+   (req, res) => {
+      res.redirect('/');
+   },
+);
+
+// 네이버 로그인
+router.get('/naver', passport.authenticate('naver'));
+
+//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+router.get('/naver/callback', passport.authenticate('naver', {
       failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
    }),
    // kakaoStrategy에서 성공한다면 콜백 실행
@@ -281,8 +290,5 @@ router.get('/kakao/callback', passport.authenticate('kakao', {
       res.redirect('/');
    },
 );
-
-
-
 
 export default router;

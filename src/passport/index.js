@@ -1,18 +1,18 @@
 import passport from 'passport';
 import { prisma } from '../utils/prisma.util.js';
 import kakaoStrategy from './kakaoStrategy.js';
-
+import naverStrategy from './naverStrategy.js';
 export const passportConfig = () => {
-    passport.serializeUser((kakaouser, done) => {
-        done(null, kakaouser.id);
+    passport.serializeUser((snsuser, done) => {
+        done(null, snsuser.id);
     });
 
     passport.deserializeUser((id, done) => {
-        prisma.kakaouser.findUnique({ where: { id } })
-            .then(kakaouser => {
-                if (kakaouser) {
-                    console.log('User found:', kakaouser);
-                    done(null, kakaouser);
+        prisma.snsuser.findUnique({ where: { id } })
+            .then(snsuser => {
+                if (snsuser) {
+                    console.log('User found:', snsuser);
+                    done(null, snsuser);
                 } else {
                     console.log('User not found');
                     done(null, false);
@@ -25,5 +25,6 @@ export const passportConfig = () => {
     });
 
     passport.use('kakao', kakaoStrategy);
+    passport.use('naver', naverStrategy);
 };
 
