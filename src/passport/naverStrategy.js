@@ -10,12 +10,12 @@ export const kakaoStrategy = new NaverStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
     console.log('naver profile', profile);
     try {
-        profile.id = String(profile.id);
+        
         let user = await prisma.snsuser.findFirst({
             where: {
                
-                    snsId: profile.id,
-                    // provider: 'kakao'
+                snsId: profile._json.id,
+                
                 
             },
         });

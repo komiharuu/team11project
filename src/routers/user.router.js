@@ -11,7 +11,7 @@ router.patch("/:userid", accessToken, ProfileValidator, async (req, res, next) =
   try {
     const userId = req.params.userid;
 
-    const { name, introduce, password, profileImgurl } = req.body;
+    const { name, introduce, email, password, profileImgurl } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { userId: parseInt(userId) },

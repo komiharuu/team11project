@@ -5,8 +5,8 @@ import jwt from "jsonwebtoken";
 import passport from "passport";
 import { requireRefreshToken } from "../middlewares/require-refresh-token.middleware.js";
 import sendEmail from "../constants/transport.constant.js";
-import signUpSchma from "../validatiors/sign-up-status.js";
-import signInSchma from "../validatiors/sign-in-status.js";
+import { SignupValidator} from "../validatiors/sign-up-status.js";
+import {SigninValidator} from "../validatiors/sign-in-status.js";
 
 const router = express.Router();
 
@@ -14,27 +14,10 @@ router.get("/sign-up", (req, res) => {
   res.render("sign-up"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 // 회원가입
-router.post("/sign-up", async (req, res, next) => {
+router.post("/sign-up", SignupValidator , async (req, res, next) => {
   try {
-    const { error, value } = signUpSchma.validate(req.body);
-
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
     const { email, password, passwordConfirm, profileImgurl, name, introduce } =
-      value;
-
-    // if (
-    //   !email ||
-    //   !password ||
-    //   !passwordConfirm ||
-    //   !name ||
-    //   !introduce ||
-    //   !profileImgurl
-    // ) {
-    //   return res.status(400).json({ message: "모든 필드를 입력해 주세요." });
-    // }
+    req.body;
 
     const isExistUser = await prisma.user.findFirst({ where: { email } });
 
@@ -80,33 +63,28 @@ router.get("/sign-in", (req, res) => {
 res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 //로그인 API
-router.post("/sign-in", async (req, res, next) => {
-  const { error, value } = signInSchma.validate(req.body);
+router.post("/sign-in", SigninValidator, async (req, res, next) => {
 
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-  const { email, password } = value;
+  const { email, password } = req.body;
 
   // - **로그인 정보 중 하나라도 빠진 경우** - “OOO을 입력해 주세요.”
-  if (!email || !password) {
-    const missingFields = [];
-    if (!email) {
-      missingFields.push("이메일을");
-    }
-    if (!password) {
-      missingFields.push("비밀번호를");
-    }
+  // if (!email || !password) {
+  //   const missingFields = [];
+  //   if (!email) {
+  //     missingFields.push("이메일을");
+  //   }
+  //   if (!password) {
+  //     missingFields.push("비밀번호를");
+  //   }
 
-    return res.status(401).json({
-      status: 401,
-      message: `${missingFields.join("")} 입력해 주세요.`,
-    });
-  }
+  //   return res.status(401).json({
+  //     status: 401,
+  //     message: `${missingFields.join("")} 입력해 주세요.`,
+  //   });
+  // }
 
   // - **이메일로 조회되지 않거나 비밀번호가 일치하지 않는 경우** - “인증 정보가 유효하지 않습니다.”
   const user = await prisma.user.findFirst({ where: { email } });
-
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ message: "인증 정보가 유효하지 않습니다." });
   }
@@ -281,13 +259,14 @@ router.get('/kakao/callback', passport.authenticate('kakao', {
 // 네이버 로그인
 router.get('/naver', passport.authenticate('naver'));
 
-//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+//? 위에서 naver 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
 router.get('/naver/callback', passport.authenticate('naver', {
       failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
    }),
    // kakaoStrategy에서 성공한다면 콜백 실행
-   (req, res) => {
+   (req, res) => { 
       res.redirect('/');
+
    },
 );
 

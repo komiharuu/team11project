@@ -13,17 +13,20 @@ export const kakaoStrategy = new KakaoStrategy({
         let user = await prisma.snsuser.findFirst({
             where: {
                
-                    snsId: profile.id,
+                   snsId: profile.id,
                     // provider: 'kakao'
                 
             },
         });
+
+      
 
         if (!user) {
             console.log(profile)
         //  사용자가 없으면 새로 계정을 생성합니다.
             const newUser = await prisma.snsuser.create({
                 data: {
+                    
                     email: profile._json.kakao_account.email,
                     name: profile.displayName,
                     image: profile._json.properties.profile_image,
