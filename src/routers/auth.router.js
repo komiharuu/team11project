@@ -73,11 +73,11 @@ router.post("/sign-up", async (req, res, next) => {
   }
 });
 
-//주소 치면 login.ejs설정화면이동!
+
 //하는중
-//router.get("/sign-in", (req, res) => {
-// res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
-//});
+router.get("/sign-in", (req, res) => {
+res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
+});
 //로그인 API
 router.post("/sign-in", async (req, res, next) => {
   const { error, value } = signInSchma.validate(req.body);

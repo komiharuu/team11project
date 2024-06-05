@@ -26,8 +26,9 @@ model User {
 
   posts    Post[]
   comments Comment[]
-  like     Like[]
-
+  like Like[]
+   followers   Follows[] @relation("UserFollowers")
+  followings   Follows[] @relation("UserFollowings")
   @@map("user")
 }
 
@@ -115,4 +116,18 @@ model Kakaouser {
   provider  String
 
   @@map("kakaouser")
+}
+
+model Follows {
+  followId   Int      @id @default(autoincrement())
+  followerId Int
+  followingId Int
+  createdAt  DateTime @default(now())
+
+   follower User @relation("UserFollowers",fields: [followerId], references: [userId])
+  following User @relation("UserFollowings",fields: [followingId], references: [userId])
+
+ @@unique([followerId, followingId])
+
+  @@map("follows")
 }

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Main Page</title>
+</head>
+<body>
+
+  <h2>여행지 추천하기</h2>
+
+  <input id="recommendedArea" type="name" placeholder="추천지역"><br>
+  <input id="recommendationReason" type="introduce" placeholder="추천이유"><br>
+  <input id="imageurl" type="url" placeholder="이미지 링크"><br>
+  <button>등록하기</button>
+  
+  <hr>
+  <h1>게시글 목록</h1>
+  <ul>
+    <% for (const post of data) { %>
+      <li>
+        <div>
+          <img src="<%= post.imageurl %>" alt="게시글 이미지">
+          <h3><%= post.recommendedArea %></h3>
+          <p><%= post.recommendationReason %></p>
+          <hr>
+        </div>
+      </li>
+    <% } %>
+
+  </ul>
+
+ <script>
+  
+  const recommendedAreaInput = document.querySelector('#recommendedArea');
+const recommendationReasonInput = document.querySelector('#recommendationReason');
+const imageurlInput = document.querySelector('#imageurl');
+const submitButton = document.querySelector('button');
+
+submitButton.addEventListener('click', async () => {
+  const recommendedArea = recommendedAreaInput.value;
+  const recommendationReason = recommendationReasonInput.value;
+  const imageurl = imageurlInput.value;
+
+  // Local Storage에서 accessToken 가져오기
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+    alert("인증정보가 유효하지 않습니다.")
+    return;
+  }
+
+  const postData = { recommendedArea, recommendationReason, imageurl };
+  const jsonString = JSON.stringify(postData);
+
+  try {
+    const response = await fetch('/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`, // 인증 토큰 추가
+      },
+      body: jsonString, // JSON 문자열로 설정
+    });
+
+    const responseData = await response.json();
+
+    if (responseData.status === 201) {
+      // 게시글 등록 성공
+      alert('게시글이 등록되었습니다.');
+      // 새로 생성된 게시글 데이터를 화면에 표시
+      location.reload();
+      // updatePostList(responseData.data);
+    } else {
+      // 게시글 등록 실패
+      console.error(responseData.message);
+    }
+  } catch (error) {
+    console.error('게시글 등록 중 오류 발생:', error);
+  }
+});
+ </script> 
+</body>
+</html>
