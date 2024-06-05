@@ -7,6 +7,9 @@ const profileUpdatedSchema = Joi.object({
     name: Joi.string()
       .required()
       .messages({ "any.required": "이름을 입력해주세요" }),
+     email: Joi.string()
+      .required()
+      .messages({ "any.required": "이름을 입력해주세요" }),
     introduce: Joi.string()
       .required()
       .messages({ "any.required": "소개는 문자열이어야 합니다." }),

@@ -51,9 +51,13 @@ router.post('/', accessToken, PostValidator, async (req, res, next) => {
       },
     });
 
-   
+
+    
+
+
+
     // 클라이언트에 생성된 데이터를 반환합니다.
-    return res.status(201).json({ status:201,message:"게시물이 등록되었습니다",data: posts });
+    return res.status(201).json({ status:201,message:"게시물이 등록되었습니다", data: posts});
   } catch (err) {
     // 에러 발생 시 에러 핸들러로 에러를 전달합니다.
     next(err);
