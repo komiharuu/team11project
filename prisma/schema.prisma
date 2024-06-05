@@ -27,7 +27,8 @@ model User {
   posts    Post[]
   comments Comment[]
   like Like[]
-
+   followers   Follows[] @relation("UserFollowers")
+  followings   Follows[] @relation("UserFollowings")
   @@map("user")
 }
 
@@ -108,4 +109,18 @@ model Like {
   @@unique([userId, postId])
 
    @@map("like")
+}
+
+model Follows {
+  followId   Int      @id @default(autoincrement())
+  followerId Int
+  followingId Int
+  createdAt  DateTime @default(now())
+
+   follower User @relation("UserFollowers",fields: [followerId], references: [userId])
+  following User @relation("UserFollowings",fields: [followingId], references: [userId])
+
+ @@unique([followerId, followingId])
+
+  @@map("follows")
 }

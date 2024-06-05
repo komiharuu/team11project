@@ -3,8 +3,34 @@ import { prisma } from "../utils/prisma.util.js";
 import  accessToken  from '../middlewares/access-token.middleware.js';
 import {PostValidator } from "../validatiors/update-post-status.js"
 
-
 const router = Router();
+
+
+//게시판 페이지 렌더링 
+router.get('/', async (req, res, next) => {
+  try {
+    const { sort = 'desc' } = req.query;
+    const sortOrder = sort.toLowerCase() === 'asc' ? 'asc' : 'desc';
+    let where = {};
+    const posts = await prisma.post.findMany({
+      where,
+      orderBy: { createdAt: sortOrder },
+      select: {
+        userId: true,
+        postId: true,
+        recommendedArea: true,
+        recommendationReason: true,
+        imageurl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    res.render('main', { data: posts });
+  } catch (err) {
+    next(err);
+  }
+});
+
 
 
 // 게시글 등록 api
@@ -25,9 +51,9 @@ router.post('/', accessToken, PostValidator, async (req, res, next) => {
       },
     });
 
-
+   
     // 클라이언트에 생성된 데이터를 반환합니다.
-    return res.status(201).json({ data: posts });
+    return res.status(201).json({ status:201,message:"게시물이 등록되었습니다",data: posts });
   } catch (err) {
     // 에러 발생 시 에러 핸들러로 에러를 전달합니다.
     next(err);
@@ -58,7 +84,8 @@ router.get('/',  async (req, res, next) => {
         updatedAt: true
       }
     });
-
+    
+  
 
     res.status(200).json({ data: posts });
   } catch (err) {

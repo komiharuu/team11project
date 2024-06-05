@@ -7,8 +7,9 @@ import { requireRefreshToken } from '../middlewares/require-refresh-token.middle
 import sendEmail from '../constants/transport.constant.js';
 const router = express.Router();
 
+//회원가입 프론트 페이지
 router.get('/sign-up',(req,res) =>{
-  res.render("sign-up"); //app.set homepage설정 그안에 /login.ejs폴더.
+  res.render("sign-up"); 
 })
 // 회원가입
 router.post("/sign-up", async (req, res, next) => {
