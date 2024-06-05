@@ -7,11 +7,15 @@ import PostRouter from "./src/routers/posts.router.js";
 import AuthRouter from "./src/routers/auth.router.js";
 import CommentRouter from "./src/routers/comment.router.js";
 import UserRouter from "./src/routers/user.router.js";
+import session  from "express-session";
 import cors from "cors";
+import passport from "passport";
 import ErrorHandlingMiddleware from "./src/middlewares/error-handler.middleware.js";
+import {passportConfig} from "./src/passport/index.js"
 dotenv.config();
 
 const app = express();
+passportConfig();
 const PORT = process.env.PORT;
 
 
@@ -24,6 +28,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors());
+app.use(session({ secret: process.env.SECRET, resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use('/auth', AuthRouter )
 app.use('/posts', PostRouter )
 app.use('/users', UserRouter)
