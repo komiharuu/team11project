@@ -5,7 +5,7 @@ import { prisma } from '../utils/prisma.util.js';
 export const kakaoStrategy = new KakaoStrategy({
     clientID: process.env.KAKAO_CLIENT_ID,
     clientSecret: process.env.KAKAO_CLIENT_SECRET,
-    callbackURL: '/auth/kakao/callback',
+    callbackURL: process.env.KAKAO_CALLBACK,
 }, async (accessToken, refreshToken, profile, done) => {
     console.log('kakao profile', profile);
     try {

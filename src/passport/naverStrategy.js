@@ -6,7 +6,7 @@ import { prisma } from '../utils/prisma.util.js';
 export const kakaoStrategy = new NaverStrategy({
     clientID: process.env.NAVER_CLIENT_ID,
     clientSecret: process.env.NAVER_CLIENT_SECRET,
-    callbackURL: '/auth/naver/callback',
+    callbackURL: process.env.NAVER_CALLBACK,
 }, async (accessToken, refreshToken, profile, done) => {
     console.log('naver profile', profile);
     try {
