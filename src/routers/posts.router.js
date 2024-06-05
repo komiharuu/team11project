@@ -227,6 +227,20 @@ router.post('/likes/:postId', accessToken, async (req, res, next) => {
   const userId = req.user.userId;
  
   try {
+
+    const post = await prisma.post.findUnique({
+      where: { postId: +postId },
+      select: { userId: true }
+    });
+
+    // 본인이 작성한 게시글에는 좋아요를 남길 수 없음
+    if (post.userId === userId) {
+      return res.status(400).json({
+        status: 400,
+        message: '본인이 작성한 게시글에는 좋아요를 남길 수 없습니다.'
+      });
+    }
+
   const existingLike = await prisma.like.findFirst({
     where: { 
       userId,

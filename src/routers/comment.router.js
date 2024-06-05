@@ -70,13 +70,13 @@ router.get("/:postId", async (req, res, next) => {
 });
 
 /** 댓글 수정 api */
-router.patch("/:commentId", accessToken, async (req, res, next) => {
+router.patch("/:postId/:commentId", accessToken, async (req, res, next) => {
   try {
     // userID 받기
-    const { userId } = req.user;
+    const { userId} = req.user;
 
     // commentId 받기
-    const { commentId } = req.params;
+    const {   postId , commentId} = req.params;
 
     // content 받기
     const { content } = req.body;
@@ -89,7 +89,8 @@ router.patch("/:commentId", accessToken, async (req, res, next) => {
     // 수정할 댓글 조회
     const comment = await prisma.comment.findFirst({
       where: {
-        userId: +userId,
+        
+        postId: +postId,
         commentId: +commentId,
       },
     });
@@ -103,6 +104,7 @@ router.patch("/:commentId", accessToken, async (req, res, next) => {
     const patchComment = await prisma.comment.update({
       where: {
         commentId: +commentId,
+        postId: +postId,
       },
       data: {
         content,
@@ -121,18 +123,19 @@ router.patch("/:commentId", accessToken, async (req, res, next) => {
 
 
 /** 댓글 삭제 api */
-router.delete('/:commentId', accessToken, async(req, res, next) => {
+router.delete('/:postId/:commentId', accessToken, async(req, res, next) => {
   try {
     // userId 받기
-    const { userId } = req.user;
+    const { userId} = req.user;
 
     // commentId 받기
-    const { commentId } = req.params;
+    const {    postId, commentId} = req.params;
     
     // comment 조회
     const comment = await prisma.comment.findFirst({
       where: {
-        userId: +userId,
+       postId: +postId,
+        
         commentId: +commentId,
       },
     });
@@ -145,6 +148,7 @@ router.delete('/:commentId', accessToken, async(req, res, next) => {
     // comment 삭제하기
     await prisma.comment.delete({
       where: {
+        postId: +postId,
         commentId: +commentId,
       },
     });
@@ -156,5 +160,107 @@ router.delete('/:commentId', accessToken, async(req, res, next) => {
     next(error);
   }
 });
+
+//댓글 좋아요 추가
+router.post('/likes/:postId/:commentId', accessToken, async (req, res, next) => {
+  const { postId, commentId } = req.params;
+  const userId = req.user.userId; // 사용자 ID 추출
+
+  try {
+    // 본인이 작성한 댓글인지 확인
+    const comment = await prisma.comment.findUnique({
+      where: { 
+        postId: +postId,
+        commentId: +commentId,
+        userId: userId // 본인이 작성한 댓글 확인
+      }
+    });
+    
+    if (comment.userId == userId) {
+      return res.status(400).json({
+        status: 400,
+        message: '본인이 작성한 댓글에만 좋아요를 남길 수 있습니다.'
+      });
+    }
+    
+
+    // 이미 좋아요를 남긴 경우
+    const like = await prisma.like.findFirst({
+      where: { 
+        postId: +postId,
+        commentId: +commentId,
+        userId: userId
+      }
+    });
+    
+    if (like) {
+      return res.status(400).json({
+        status: 400,
+        message: '이미 이 댓글에 좋아요를 눌렀습니다.'
+      });
+    }
+
+    // 게시물 좋아요 추가
+    const newLike = await prisma.like.create({
+      data: {
+        postId: +postId,
+        commentId: +commentId,
+        userId: userId
+      }
+    });
+
+    return res.status(201).json({
+      status: 201,
+      message: '댓글에 좋아요가 추가되었습니다.',
+      data: newLike
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+// 댓글 좋아요 제거
+router.delete('/likes/:postId/:commentId', accessToken, async (req, res, next) => {
+  const { postId, commentId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    // 좋아요 찾기
+    const like = await prisma.like.findFirst({
+      where: {
+        postId: +postId,
+        commentId: +commentId,
+        userId: +userId
+      }
+    });
+
+    if (!like) {
+      return res.status(404).json({
+        status: 404,
+        message: '해당 좋아요가 존재하지 않습니다.'
+      });
+    }
+
+    // 좋아요 삭제
+    await prisma.like.delete({
+      where: {
+       likeId: like.likeId
+      }
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: '댓글 좋아요가 제거되었습니다.'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+
 
 export default router;
