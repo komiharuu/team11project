@@ -88,7 +88,7 @@ model Comment {
 
   post Post @relation(fields: [postId], references: [postId])
   user User @relation(fields: [userId], references: [userId])
-
+ like     Like[]
   @@map("comment")
 }
 
@@ -103,13 +103,14 @@ model Email {
 model Like {
   likeId    Int      @id @default(autoincrement())
   userId    Int
-  postId    Int
+  postId    Int?
+  commentId Int?
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [userId])
-  post Post @relation(fields: [postId], references: [postId])
-
-  @@unique([userId, postId])
+  post Post? @relation(fields: [postId], references: [postId])
+  comment Comment? @relation(fields: [commentId], references: [commentId])
+  @@unique([userId, postId, commentId])
   @@map("like")
 }
 
