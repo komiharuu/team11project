@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로필</title>
+    <style>
+      .container {
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        text-align: center;
+      }
+      h2 {
+        text-align: center;
+      }
+      .profile-img {
+        max-width: 100px;
+        height: auto;
+        border-radius: 50%;
+      }
+      .profile-info {
+        text-align: left;
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 20px;
+      }
+      .profile-container {
+        display: flex;
+        align-items: center;
+      }
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      button {
+        width: 48%;
+        margin-right: 2%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>프로필</h2>
+      <label for="name">이름:</label>
+      <input type="text" id="name" name="name" /><br /><br />
+      <label for="introduce">소개:</label>
+      <textarea id="introduce" name="introduce"></textarea><br /><br />
+      <label for="password">새로운 비밀번호:</label>
+      <input type="password" id="password" name="password" /><br /><br />
+      <label for="profileImgurl">프로필 이미지 URL:</label>
+      <input type="text" id="profileImgurl" name="profileImgurl" /><br /><br />
+      <button id="updateBtn">프로필 수정</button>
+    </div>
+
+    <script>
+      const userid = window.location.pathname.split("/").pop();
+      function fetchProfile() {
+        fetch("/users/:userId", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              document.getElementById("name").value = data.profile.name;
+              document.getElementById("introduce").value =
+                data.profile.introduce;
+              document.getElementById("profileImgurl").value =
+                data.profile.profileImgurl;
+            } else {
+              alert("프로필 정보를 불러오는 데 실패했습니다: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("프로필 정보를 불러오는 중 오류가 발생했습니다.");
+          });
+      }
+
+      // 페이지 로드 시 프로필 정보를 불러옴
+      window.onload = fetchProfile;
+
+      // 프로필 수정 버튼 클릭 시 실행되는 함수
+      document
+        .getElementById("updateBtn")
+        .addEventListener("click", function () {
+          const name = document.getElementById("name").value;
+          const introduce = document.getElementById("introduce").value;
+          const password = document.getElementById("password").value;
+          const profileImgurl = document.getElementById("profileImgurl").value;
+
+          const requestBody = {
+            name: name,
+            introduce: introduce,
+            password: password,
+            profileImgurl: profileImgurl,
+          };
+
+          fetch("/users/" + userid, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+            body: JSON.stringify(requestBody), // 바디 포함
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === 200) {
+                alert(data.message);
+                // 프로필 정보를 다시 불러옴
+                fetchProfile();
+              } else {
+                alert("프로필 수정 중 에러가 발생했습니다: " + data.message);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("프로필 수정 중 오류가 발생했습니다.");
+            });
+        });
+    </script>
+  </body>
+</html>

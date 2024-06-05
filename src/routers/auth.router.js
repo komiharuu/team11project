@@ -2,10 +2,11 @@ import express from "express";
 import { prisma } from "../utils/prisma.util.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import passport from "passport";
 import { requireRefreshToken } from "../middlewares/require-refresh-token.middleware.js";
 import sendEmail from "../constants/transport.constant.js";
-import signUpSchma from "../validatiors/sign-up-status.js";
-import signInSchma from "../validatiors/sign-in-status.js";
+import { SignupValidator } from "../validatiors/sign-up-status.js";
+import { SigninValidator } from "../validatiors/sign-in-status.js";
 
 const router = express.Router();
 
@@ -13,27 +14,10 @@ router.get("/sign-up", (req, res) => {
   res.render("sign-up"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 // 회원가입
-router.post("/sign-up", async (req, res, next) => {
+router.post("/sign-up", SignupValidator,async (req, res, next) => {
   try {
-    const { error, value } = signUpSchma.validate(req.body);
-
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
     const { email, password, passwordConfirm, profileImgurl, name, introduce } =
-      value;
-
-    if (
-      !email ||
-      !password ||
-      !passwordConfirm ||
-      !name ||
-      !introduce ||
-      !profileImgurl
-    ) {
-      return res.status(400).json({ message: "모든 필드를 입력해 주세요." });
-    }
+      req.body;
 
     const isExistUser = await prisma.user.findFirst({ where: { email } });
 
@@ -73,39 +57,16 @@ router.post("/sign-up", async (req, res, next) => {
   }
 });
 
-
 //하는중
 router.get("/sign-in", (req, res) => {
-res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
+  res.render("login"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 //로그인 API
-router.post("/sign-in", async (req, res, next) => {
-  const { error, value } = signInSchma.validate(req.body);
-
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-  const { email, password } = value;
-
-  // - **로그인 정보 중 하나라도 빠진 경우** - “OOO을 입력해 주세요.”
-  if (!email || !password) {
-    const missingFields = [];
-    if (!email) {
-      missingFields.push("이메일을");
-    }
-    if (!password) {
-      missingFields.push("비밀번호를");
-    }
-
-    return res.status(401).json({
-      status: 401,
-      message: `${missingFields.join("")} 입력해 주세요.`,
-    });
-  }
+router.post("/sign-in", SigninValidator, async (req, res, next) => {
+  const { email, password } = req.body;
 
   // - **이메일로 조회되지 않거나 비밀번호가 일치하지 않는 경우** - “인증 정보가 유효하지 않습니다.”
   const user = await prisma.user.findFirst({ where: { email } });
-
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ message: "인증 정보가 유효하지 않습니다." });
   }
@@ -230,11 +191,6 @@ router.post("/verify-email", async (req, res) => {
   }
 });
 
-// 서버에서 인증번호를 알고있어야한다. 그래서 스키마를 추가했습니다.
-// 서버가 열렸을때 메모리 임시저장
-// 데이터베이스 따로 생성 email과 인증코드
-// 인증번호 발급. 그때부터 알아야 한다. 개발 처음부터 스키마 짜는 것이 좋다.
-
 //이메일 인증번호 확인 api
 
 router.get("/verify-email/:email", async (req, res) => {
@@ -242,7 +198,7 @@ router.get("/verify-email/:email", async (req, res) => {
     const { verificationCode } = req.body;
     const email = req.params.email;
 
-    // Check if the provided verification code and email exist in the database
+    //이메일이 데이터베이스에 존재하는지 확인합니다.
     const record = await prisma.email.findFirst({
       where: { email },
       orderBy: { createdAt: "desc" },
@@ -267,22 +223,19 @@ router.get("/verify-email/:email", async (req, res) => {
   }
 });
 
-
-
 //* 카카오로 로그인하기 라우터 ***********************
-// router.get('/kakao', passport.authenticate('kakao'));
+router.get("/kakao", passport.authenticate("kakao"));
 
-// //? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
-// router.get('/kakao/callback', passport.authenticate('kakao', {
-//       failureRedirect: '/', // kakaoStrategy에서 실패한다면 실행
-//    }),
-//    // kakaoStrategy에서 성공한다면 콜백 실행
-//    (req, res) => {
-//       res.redirect('/');
-//    },
-// );
-
-
-
+//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao", {
+    failureRedirect: "/", // kakaoStrategy에서 실패한다면 실행
+  }),
+  // kakaoStrategy에서 성공한다면 콜백 실행
+  (req, res) => {
+    res.redirect("/");
+  },
+);
 
 export default router;

@@ -81,9 +81,13 @@ router.post('/', accessToken, PostValidator, async (req, res, next) => {
       },
     });
 
-   
+
+    
+
+
+
     // 클라이언트에 생성된 데이터를 반환합니다.
-    return res.status(201).json({ status:201,message:"게시물이 등록되었습니다",data: posts });
+    return res.status(201).json({ status:201,message:"게시물이 등록되었습니다", data: posts});
   } catch (err) {
     // 에러 발생 시 에러 핸들러로 에러를 전달합니다.
     next(err);
@@ -253,6 +257,20 @@ router.post('/likes/:postId', accessToken, async (req, res, next) => {
   const userId = req.user.userId;
  
   try {
+
+    const post = await prisma.post.findUnique({
+      where: { postId: +postId },
+      select: { userId: true }
+    });
+
+    // 본인이 작성한 게시글에는 좋아요를 남길 수 없음
+    if (post.userId === userId) {
+      return res.status(400).json({
+        status: 400,
+        message: '본인이 작성한 게시글에는 좋아요를 남길 수 없습니다.'
+      });
+    }
+
   const existingLike = await prisma.like.findFirst({
     where: { 
       userId,
