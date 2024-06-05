@@ -10,11 +10,11 @@ import { SigninValidator } from "../validatiors/sign-in-status.js";
 
 const router = express.Router();
 
-router.get("/sign-up", SignupValidator, (req, res) => {
+router.get("/sign-up", (req, res) => {
   res.render("sign-up"); //app.set homepage설정 그안에 /login.ejs폴더.
 });
 // 회원가입
-router.post("/sign-up", async (req, res, next) => {
+router.post("/sign-up", SignupValidator,async (req, res, next) => {
   try {
     const { email, password, passwordConfirm, profileImgurl, name, introduce } =
       req.body;
@@ -63,28 +63,7 @@ router.get("/sign-in", (req, res) => {
 });
 //로그인 API
 router.post("/sign-in", SigninValidator, async (req, res, next) => {
-  const { error, value } = signInSchema.validate(req.body);
-
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-  const { email, password } = value;
-
-  // - **로그인 정보 중 하나라도 빠진 경우** - “OOO을 입력해 주세요.”
-  // if (!email || !password) {
-  //   const missingFields = [];
-  //   if (!email) {
-  //     missingFields.push("이메일을");
-  //   }
-  //   if (!password) {
-  //     missingFields.push("비밀번호를");
-  //   }
-
-  //   return res.status(401).json({
-  //     status: 401,
-  //     message: `${missingFields.join("")} 입력해 주세요.`,
-  //   });
-  // }
+  const { email, password } = req.body;
 
   // - **이메일로 조회되지 않거나 비밀번호가 일치하지 않는 경우** - “인증 정보가 유효하지 않습니다.”
   const user = await prisma.user.findFirst({ where: { email } });

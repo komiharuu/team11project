@@ -93,4 +93,69 @@ router.get("/:userid", accessToken, async (req, res, next) => {
   }
 });
 
+//팔로우 기능
+
+router.post('/follows/:userId', accessToken,async(req, res, next)=>{
+  try{
+  const followingId =req.params.userId; //팔로잉 한 사람 아이디
+  const followerId = req.user.userId; // 현재 사용자의 userId
+  
+  const existingFollow = await prisma.follows.findFirst({
+    where: {
+      followerId,
+      followingId: +followingId
+    }
+  });
+  
+  if (existingFollow) {
+    return res.status(400).json({ message: '이미 해당 사용자를 팔로우하고 있습니다.' });
+  }
+
+  const follow = await prisma.follows.create({
+    data: {
+      followerId,
+      followingId :+followingId
+    }
+  });
+  res.status(201).json({ status:201, message: '팔로우가 생성되었습니다.', follow });
+}catch(error){
+  next(error);
+}
+})
+
+//팔로우 끊기
+router.patch('/follows/:userId', accessToken, async (req, res, next) => {
+  try {
+    const followingId = req.params.userId; // 팔로잉 한 사람 아이디
+    const followerId = req.user.userId; // 현재 사용자의 userId
+
+
+
+    const existingFollow = await prisma.follows.findFirst({
+      where: {
+        followerId,
+        followingId: +followingId
+      }
+    });
+    
+    if (!existingFollow) {
+      return res.status(400).json({ message: '해당 사용자를 팔로잉 하지 않았습니다.' });
+    }
+
+    
+    const deletedFollow = await prisma.follows.deleteMany({
+      where: {
+        followerId,
+        followingId: +followingId
+      }
+    });
+    
+    res.status(200).json({ message:`ID:${followingId} 팔로우가 취소되었습니다.`, deletedFollow });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
 export default router;
