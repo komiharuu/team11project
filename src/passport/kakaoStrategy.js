@@ -32,7 +32,7 @@ export const kakaoStrategy = new KakaoStrategy({
                     image: profile._json.properties.profile_image,
                     snsId: profile.id,
                     provider: 'kakao',
-                    accessToken: accessToken,
+                   
                 }
             });
             done(null, newUser); 
