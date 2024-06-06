@@ -3,7 +3,7 @@
 import { Strategy as NaverStrategy } from 'passport-naver';
 import { prisma } from '../utils/prisma.util.js';
 
-export const kakaoStrategy = new NaverStrategy({
+export const naverStrategy = new NaverStrategy({
     clientID: process.env.NAVER_CLIENT_ID,
     clientSecret: process.env.NAVER_CLIENT_SECRET,
     callbackURL: process.env.NAVER_CALLBACK,
@@ -41,4 +41,4 @@ export const kakaoStrategy = new NaverStrategy({
     }
 });
 
-export default kakaoStrategy;
+export default naverStrategy;

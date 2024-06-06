@@ -12,9 +12,10 @@
 
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=IBM+Plex+Sans+KR&family=Poor+Story&display=swap');
        body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f8f9fa;
+        font-family: "Gowun Batang", serif;
+      background-color: #f7b9c2;
       padding: 20px;
     }
 
@@ -27,7 +28,7 @@
       display: block;
       margin: 0 auto 20px;
       padding: 10px 20px;
-      background-color: #007bff;
+      background-color: transparent;
       color: #fff;
       border: none;
       border-radius: 5px;
@@ -151,7 +152,7 @@
 
 <body>
   <h1><%= post.userId %>번님의 추천 여행지</h1>
-  <button>Home</button>
+  <button><a href="/posts">🏠</a></button>
   <div class="post">
     <div id="stick" class="card mb-3">
       <div class="card mb-3" style="max-width: 1200px;">
@@ -164,9 +165,6 @@
               <h4>ID:<%= post.userId %><h4>
               <h5 id="recommendedArea" class="card-title">추천여행지: <%= post.recommendedArea %></h5>
               <p id="recommendationReason" class="card-text">추천이유: <%= post.recommendationReason %></p>
-              <button id="like-btn" class="like-btn">
-                <i class="far fa-heart heart-icon"></i>
-              </button>
             </div>
           </div>
         </div>
@@ -174,59 +172,9 @@
     </div>
   </div>
 
-  <div id="review"></div>
 
-  <!-- 리뷰 입력 섹션 -->
-  <div class="postBox">
-    <form class="row g-3">
-      <div class="col-md-6">
-        <label for="inputCity" class="form-label"></label>
-        <% if (post.comments && post.comments.length > 0) { %>
-          <p>이름: <%= post.comments[0].userId %></p> <!-- 첫 번째 댓글의 작성자 ID를 표시 -->
-        <% } else { %>
-          <p>댓글이 없습니다.</p>
-        <% } %>
-      </div>
-      <!-- <div class="col-md-2">
-        <label for="inputZip" class="form-label"></label>
-        <input type="text" class="form-control" id="inputZip" placeholder="비번">
-      </div> -->
-      <!-- 리뷰 입력 길이 div md-8 -->
-      <div class="row g-2">
-        <div class="col-md-8">
-          <div class="col-md-auto">
-            <div class="form-floating">
-              <div class="input-group mb-3">
-                <span class="input-group-text" id="inputGroup-sizing-default">댓글</span>
-                <input type="text" class="form-control" id="reviewInput" aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-default">
-              </div>
-            </div>
-          </div>
-          <!-- 리뷰 등록 버튼 -->
-          <div class="col-12">
-            <button type="submit" id="reviewBtn" class="btn btn-primary">입력</button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
 
-  <!-- 작성한 리뷰 목록 -->
-  <div class="reviewList">
-    <div id="list" class="list-group">
-      <a href="#" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">불곰</h5>
-        </div>
-        <p class="mb-1">최고의 영화 감동의 도가니 보고보고 또 봐도 감동 ㅠㅠ.</p>
-        <!-- <div class="d-grid gap-2 d-md-flex justify-content-md-end"> -->
-        <button type="button" class="btn btn-primary btn-sm" id="updateBtn">수정</button>
-        <button id="deleteBtn" type="button" class="btn btn-secondary btn-sm">삭제</button>
-        <!-- </div> -->
-      </a>
-    </div>
-  </div>
+
 
   <div class="blank"></div>
 

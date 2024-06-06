@@ -5,9 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원가입</title>
+
   <style>
-    
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Poor+Story&display=swap');
       * {
+        font-family: "Poor Story", system-ui;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
@@ -15,7 +17,7 @@
     
       body {
         font-family: Arial, sans-serif;
-        background-color: #f7f7f7;
+        background-color: #FDB2AB;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -37,6 +39,13 @@
         color: #333;
       }
     
+      h5 {
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: #333;
+      }
+
+
       input {
         width: 100%;
         padding: 0.75rem;
@@ -75,6 +84,7 @@
   <body>
     <div class="container">
       <h2>회원가입! 여행을 떠나요!</h2>
+      <h5>여행을 떠나요의 가족이 함께 되어보아요😎</h5>
       <input id="email" type="email" placeholder="이메일" /><br />
       <input id="password" type="password" placeholder="비밀번호" /><br />
       <input

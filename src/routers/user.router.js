@@ -66,7 +66,7 @@ router.patch(
 router.get("/:userid", accessToken, async (req, res, next) => {
   try {
     const userId = req.params.userid;
-    const { email, password, passwordConfirm } = req.body;
+
 
     const user = await prisma.user.findUnique({
       where: { userId: parseInt(userId) },
@@ -124,7 +124,7 @@ router.post('/follows/:userId', accessToken,async(req, res, next)=>{
 })
 
 //팔로우 끊기
-router.patch('/follows/:userId', accessToken, async (req, res, next) => {
+router.delete('/follows/:userId', accessToken, async (req, res, next) => {
   try {
     const followingId = req.params.userId; // 팔로잉 한 사람 아이디
     const followerId = req.user.userId; // 현재 사용자의 userId
@@ -150,7 +150,7 @@ router.patch('/follows/:userId', accessToken, async (req, res, next) => {
       }
     });
     
-    res.status(200).json({ message:`ID:${followingId} 팔로우가 취소되었습니다.`, deletedFollow });
+    res.status(200).json({ message:`${followingId}님을 팔로우 취소하였습니다.`, deletedFollow });
   } catch (error) {
     next(error);
   }
