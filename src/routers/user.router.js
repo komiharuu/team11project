@@ -93,7 +93,7 @@ router.get("/:userid", accessToken, async (req, res, next) => {
   }
 });
 
-//팔로우 기능
+//팔로우 기능 api
 
 router.post('/follows/:userId', accessToken,async(req, res, next)=>{
   try{

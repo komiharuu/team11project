@@ -186,7 +186,7 @@ router.post("/verify-email", async (req, res) => {
     // 성공적으로 이메일을 보낸 후 클라이언트에게 응답합니다.
     res.status(200).json({ message: "인증번호가 성공적으로 전송되었습니다" });
   } catch (error) {
-    // 이메일 전송 중 오류가 발생한 경우 오류를 클라이언트에게 전달합니다.
+  
     res.status(400).json({ message: "이메일 전송에 실패했습니다." });
   }
 });
@@ -211,7 +211,7 @@ router.get("/verify-email/:email", async (req, res) => {
       return;
     }
 
-    // 메일 주체가 다르다?
+    // 인증 확인 메세지
     if (record.verificationCode === parseInt(verificationCode, 10)) {
       res.status(200).json({ message: "이메일이 성공적으로 인증되었습니다." });
     } else {
@@ -223,16 +223,15 @@ router.get("/verify-email/:email", async (req, res) => {
   }
 });
 
-//* 카카오로 로그인하기 라우터 ***********************
+//* 카카오 로그인
 router.get("/kakao", passport.authenticate("kakao"));
 
-//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
 router.get(
   "/kakao/callback",
   passport.authenticate("kakao", {
-    failureRedirect: "/", // kakaoStrategy에서 실패한다면 실행
+    failureRedirect: "/", 
   }),
-  // kakaoStrategy에서 성공한다면 콜백 실행
+  
   (req, res) => {
     res.redirect("/posts");
   },

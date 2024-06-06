@@ -165,7 +165,7 @@ router.delete('/:postId/:commentId', accessToken, async(req, res, next) => {
 //댓글 좋아요 추가
 router.post('/likes/:postId/:commentId', accessToken, async (req, res, next) => {
   const { postId, commentId } = req.params;
-  const userId = req.user.userId; // 사용자 ID 추출
+  const userId = req.user.userId; 
 
   try {
     // 본인이 작성한 댓글인지 확인
@@ -173,7 +173,7 @@ router.post('/likes/:postId/:commentId', accessToken, async (req, res, next) => 
       where: { 
        commentId: +commentId, 
         postId: +postId, 
-        userId: userId // 본인이 작성한 댓글 확인
+        userId: userId 
       }
     });
 

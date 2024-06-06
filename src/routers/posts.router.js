@@ -126,8 +126,6 @@ router.get('/',  async (req, res, next) => {
 
 
 
-
-
 // 게시글 상세조회 api
 router.get('/:postId',  async (req, res, next) => {
   try {
@@ -160,6 +158,29 @@ router.get('/:postId',  async (req, res, next) => {
     next(err);
   }
 });
+
+
+
+// 본인이 팔로우 한 사람들의 게시글을 볼 수 있는 api
+router.get('/follow/:userId', accessToken, async (req, res) => {
+  const { userId } = req.params;
+  const following = await prisma.follows.findMany({
+    where: { followerId: +userId },
+    select: { followingId: true },
+  });
+  const followingIds = following.map(f => f.followingId);
+
+  const posts = await prisma.post.findMany({
+    where: { userId: { in: followingIds } },
+    orderBy: { createdAt: 'desc' },
+    include: { user: true },
+  });
+
+  res.json(posts);
+});
+
+
+
 
 /** 게시글 수정 API */
 router.patch("/:postId", accessToken, async (req, res, next) => {
@@ -216,7 +237,7 @@ router.patch("/:postId", accessToken, async (req, res, next) => {
 /** 게시글 삭제 API */
 router.delete("/:postId", accessToken, async (req, res, next) => {
   try {
-    // userId를 req.posts에서 받기- user로 해도 됩니다.
+    // userId를 req.user에서 받기
     const { userId } = req.user;
 
     // postId를 req.params에서 받기
@@ -250,8 +271,6 @@ router.delete("/:postId", accessToken, async (req, res, next) => {
   }
 });
 
-
-//좋아요 생성, 삭제 기능 구현중
 //게시물 좋아요 추가
 router.post('/likes/:postId', accessToken, async (req, res, next) => {
   const { postId } = req.params;
@@ -305,7 +324,7 @@ router.post('/likes/:postId', accessToken, async (req, res, next) => {
   }
 });
 
-// 게시물 좋아요 제거
+// 게시물 좋아요 제거 api
 router.delete('/likes/:postId', accessToken, async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user.userId;
@@ -342,8 +361,9 @@ router.delete('/likes/:postId', accessToken, async (req, res, next) => {
   }
 });
 
-router.get('/upload', (req,res) => { res.sendFile(path.join(__dirname, 'html.html'))});
+
 // 멀티미디어 업로드
+router.get('/upload', (req,res) => { res.sendFile(path.join(__dirname, 'html.html'))});
 
 router.post('/upload', multerMiddleware, (req, res) => {
   console.log(req.files, req.body);
