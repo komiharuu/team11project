@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Poor+Story&display=swap');
+body {
+  font-family: "Poor Story", system-ui;
+  background-color:  #FFBB9E;
+  ;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  width: 350px;
+  padding: 70px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center; /* 로그인 폼 요소를 가운데 정렬 */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+input[type="email"],
+input[type="password"],
+button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #C5AECF;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+input[type="email"],
+input[type="password"] {
+  display: block;
+  box-sizing: border-box;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+    <h2>WELCOME! 여행을 떠나요!</h2>
+    <input id="email" type="email" placeholder="이메일"><br>
+    <input id="password" type="password" placeholder="비밀번호"><br>
+    <button>로그인</button>
+    <div class="signup-link">
+      <hr> <!-- 수평선 추가 -->
+      <button>계정이 없으신가요? <a href="/auth/sign-up">회원가입</a></button>
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    const email = document.querySelector("#email");
+    const password = document.querySelector("#password");
+    const loginBtn = document.querySelector("button");
+    
+    loginBtn.addEventListener("click", login);
+
+    function login() {
+      const req = {
+        email: email.value,
+        password: password.value,
+      };
+      fetch("/auth/sign-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 200) {
+          alert(data.message);
+          // 성공 시 토큰을 로컬 스토리지나 쿠키에 저장
+          localStorage.setItem('accessToken', data.data.accessToken);
+          localStorage.setItem('refreshToken', data.data.refreshToken);
+          // 로그인 성공 후 리다이렉트 (예: 홈페이지로)
+          window.location.href = "/posts";
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("로그인 중 오류가 발생했습니다.");
+      });
+    }
+  </script>
+</body>
+</html>

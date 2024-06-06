@@ -24,8 +24,11 @@ model User {
   userInfo     UserInfo?
   refreshToken RefreshToken?
 
-  posts    Post[]
-  comments Comment[]
+  posts      Post[]
+  comments   Comment[]
+  like       Like[]
+  followers  Follows[] @relation("UserFollowers")
+  followings Follows[] @relation("UserFollowings")
 
   @@map("user")
 }
@@ -53,21 +56,25 @@ model RefreshToken {
 
   user User @relation(fields: [userId], references: [userId])
 
-  @@map("refresh_token")
+  @@map("refreshtoken")
 }
 
 model Post {
   postId               Int      @id @default(autoincrement())
-  userId               Int
+  userId               Int?
+  snsuserId            String?  
   recommendedArea      String
   recommendationReason String   @db.Text
   imageurl             String
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  user     User      @relation(fields: [userId], references: [userId])
+  snsuser  Snsuser?   @relation(fields: [snsuserId], references: [snsId])
+  user     User?      @relation(fields: [userId], references: [userId])
   comments Comment[]
+  like     Like[]
 
+  // kakaouser Kakaouser @relation(fields: [kakaouserId], references: [kakaouserId])
   @@map("post")
 }
 
@@ -81,6 +88,53 @@ model Comment {
 
   post Post @relation(fields: [postId], references: [postId])
   user User @relation(fields: [userId], references: [userId])
-
+ like     Like[]
   @@map("comment")
+}
+
+model Email {
+  verificationCode Int      @unique
+  email            String
+  createdAt        DateTime @default(now())
+
+  @@map("email")
+}
+
+model Like {
+  likeId    Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int?
+  commentId Int?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [userId])
+  post Post? @relation(fields: [postId], references: [postId])
+  comment Comment? @relation(fields: [commentId], references: [commentId])
+  @@unique([userId, postId, commentId])
+  @@map("like")
+}
+
+model Snsuser {
+  id       Int    @id @default(autoincrement())
+  email    String
+  name     String
+  image    String
+  snsId    String @unique
+  provider String
+  posts     Post[]
+
+  @@map("snsuser")
+}
+
+model Follows {
+  followId    Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowers", fields: [followerId], references: [userId])
+  following User @relation("UserFollowings", fields: [followingId], references: [userId])
+
+  @@unique([followerId, followingId])
+  @@map("follows")
 }

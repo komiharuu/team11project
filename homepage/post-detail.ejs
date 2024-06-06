@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시물 상세 페이지</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=IBM+Plex+Sans+KR&family=Poor+Story&display=swap');
+       body {
+        font-family: "Gowun Batang", serif;
+      background-color: #f7b9c2;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      display: block;
+      margin: 0 auto 20px;
+      padding: 10px 20px;
+      background-color: transparent;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .post {
+      max-width: 1200px;
+      margin: 0 auto;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card img {
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .card-text {
+      font-size: 16px;
+    }
+
+    #review {
+      margin-top: 40px;
+    }
+
+    .postBox {
+      max-width: 1200px;
+      margin: 0 auto;
+      margin-bottom: 40px;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .postBox .form-control,
+    .postBox .form-select {
+      border-radius: 5px;
+    }
+
+    .postBox button {
+      background-color: #28a745;
+    }
+
+    .postBox button:hover {
+      background-color: #218838;
+    }
+
+    .reviewList {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+   
+    .reviewList .list-group-item h5 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .reviewList .list-group-item p {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .reviewList .btn-sm {
+      margin-right: 5px;
+    }
+
+    .blank {
+      height: 50px;
+    }
+
+    .heart-icon {
+      font-size: 24px;
+      color: #ccc;
+      transition: color 0.3s;
+    }
+
+    .heart-icon.clicked {
+      color: red;
+    }
+   
+    
+    #updateBtn{
+      margin-left: 800px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #reviewCheck{
+      margin-left: 700px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1><%= post.userId %>번님의 추천 여행지</h1>
+  <button><a href="/posts">🏠</a></button>
+  <div class="post">
+    <div id="stick" class="card mb-3">
+      <div class="card mb-3" style="max-width: 1200px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="<%= post.imageurl %>" class="img-fluid rounded-start" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h4>ID:<%= post.userId %><h4>
+              <h5 id="recommendedArea" class="card-title">추천여행지: <%= post.recommendedArea %></h5>
+              <p id="recommendationReason" class="card-text">추천이유: <%= post.recommendationReason %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  <div class="blank"></div>
+
+  <script>
+    
+  </script>
+</body>
+
+ 
+  </html>
+  
+
+
+
