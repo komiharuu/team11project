@@ -27,7 +27,6 @@ export default async function (req, res, next) {
     
     next();
   } catch (error) {
-    // 토큰이 만료되었거나, 조작되었을 때, 에러 메시지를 다르게 출력합니다.
     switch (error.name) {
       case "TokenExpiredError":
         return res.status(401).json({ message: "토큰이 만료되었습니다." });

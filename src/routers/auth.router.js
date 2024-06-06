@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
 import { requireRefreshToken } from "../middlewares/require-refresh-token.middleware.js";
-import sendEmail from "../constants/transport.constant.js";
+import sendEmail from "../transports/transport.js";
 import { SignupValidator } from "../validatiors/sign-up-status.js";
 import { SigninValidator } from "../validatiors/sign-in-status.js";
 
@@ -234,8 +234,25 @@ router.get(
   }),
   // kakaoStrategy에서 성공한다면 콜백 실행
   (req, res) => {
-    res.redirect("/");
+    res.redirect("/posts");
   },
 );
+
+// 네이버 로그인
+router.get("/naver", passport.authenticate("naver"));
+
+router.get(
+  "/naver/callback",
+  passport.authenticate("naver", {
+    failureRedirect: "/",
+  }),
+
+  (req, res) => {
+    res.redirect("/posts");
+  },
+);
+
+
+
 
 export default router;

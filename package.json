@@ -1,5 +1,5 @@
 {
-  "name": "soobeen",
+  "name": "team11",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "express-session": "^1.18.0",
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
     "passport-kakao": "^1.0.1",
     "passport-local": "^1.0.0",

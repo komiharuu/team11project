@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../utils/prisma.util.js";
 import  accessToken  from '../middlewares/access-token.middleware.js';
-import {PostValidator } from "../validatiors/update-post-status.js"
-
+import {PostValidator } from "../validatiors/update-post-status.js";
+import {multerMiddleware} from "../middlewares/multer.middleware.js";
 const router = Router();
 
 //게시물 상세 렌더링 조회 
@@ -82,9 +82,6 @@ router.post('/', accessToken, PostValidator, async (req, res, next) => {
     });
 
 
-    
-
-
 
     // 클라이언트에 생성된 데이터를 반환합니다.
     return res.status(201).json({ status:201,message:"게시물이 등록되었습니다", data: posts});
@@ -126,6 +123,10 @@ router.get('/',  async (req, res, next) => {
     next(err);
   }
 });
+
+
+
+
 
 // 게시글 상세조회 api
 router.get('/:postId',  async (req, res, next) => {
@@ -340,6 +341,19 @@ router.delete('/likes/:postId', accessToken, async (req, res, next) => {
     next(err);
   }
 });
+
+router.get('/upload', (req,res) => { res.sendFile(path.join(__dirname, 'html.html'))});
+// 멀티미디어 업로드
+
+router.post('/upload', multerMiddleware, (req, res) => {
+  console.log(req.files, req.body);
+  const fileUrls = Object.keys(req.files).map(fieldName => {
+    return req.files[fieldName].map(file => `/posts/upload/${file.filename}`);
+  }).flat();
+  res.json({ urls: fileUrls });
+});
+
+
 
 
 export default router;

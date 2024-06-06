@@ -155,7 +155,7 @@ router.delete('/:postId/:commentId', accessToken, async(req, res, next) => {
     });
 
     // 삭제된 commentId 반환
-    return res.status(200).json({ message: '댓글이 삭제되었습니다.', data: commentId });
+    return res.status(200).json({ message: '댓글이 삭제되었습니다.', commentId: commentId });
 
   } catch(error){
     next(error);
@@ -169,31 +169,30 @@ router.post('/likes/:postId/:commentId', accessToken, async (req, res, next) => 
 
   try {
     // 본인이 작성한 댓글인지 확인
-    const comment = await prisma.comment.findUnique({
+    const comment = await prisma.comment.findFirst({
       where: { 
-        postId: +postId,
-        commentId: +commentId,
+       commentId: +commentId, 
+        postId: +postId, 
         userId: userId // 본인이 작성한 댓글 확인
       }
     });
-    
-    if (comment.userId == userId) {
+
+    if (comment) {
       return res.status(400).json({
         status: 400,
-        message: '본인이 작성한 댓글에만 좋아요를 남길 수 있습니다.'
+        message: '본인이 작성한 댓글에는 좋아요를 남길 수 없습니다.'
       });
     }
-    
 
     // 이미 좋아요를 남긴 경우
     const like = await prisma.like.findFirst({
       where: { 
-        postId: +postId,
         commentId: +commentId,
+        postId: +postId,
         userId: userId
       }
     });
-    
+
     if (like) {
       return res.status(400).json({
         status: 400,
@@ -201,7 +200,7 @@ router.post('/likes/:postId/:commentId', accessToken, async (req, res, next) => 
       });
     }
 
-    // 게시물 좋아요 추가
+    // 댓글 좋아요 추가
     const newLike = await prisma.like.create({
       data: {
         postId: +postId,
@@ -221,7 +220,6 @@ router.post('/likes/:postId/:commentId', accessToken, async (req, res, next) => 
 });
 
 
-
 // 댓글 좋아요 제거
 router.delete('/likes/:postId/:commentId', accessToken, async (req, res, next) => {
   const { postId, commentId } = req.params;
@@ -231,7 +229,7 @@ router.delete('/likes/:postId/:commentId', accessToken, async (req, res, next) =
     // 좋아요 찾기
     const like = await prisma.like.findFirst({
       where: {
-        postId: +postId,
+       
         commentId: +commentId,
         userId: +userId
       }
