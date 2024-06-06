@@ -14,6 +14,11 @@
 3. 게시물을 관리할 수 있다.(등록, 수정, 조회, 삭제)
 
 4. 타인의 게시물에 댓글을 추가하여 소통할 수 있다. (댓글 저장, 수정, 삭제)
+5. 이메일 가입 시 이메일 인증 기능을 포함하게 했다.
+6. 네이버, 카카오 로그인이 가능하다.
+7. 게시물 및 댓글에 좋아요를 누를 수 있고 좋아요 취소 기능을 구현하였다.
+8.  팔로워 기능을 구현함으로 회원들의 게시물을 구독할 수 있다.
+   
 
 ## 프로젝트 실행 방법
 
@@ -30,7 +35,7 @@
   <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white">
   <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
   <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> 
-
+![Nodemon](https://img.shields.io/badge/NODEMON-%23323330.svg?style=for-the-badge&logo=nodemon&logoColor=%BBDEAD)
 
 ## 프로젝트 부가 내용
 
